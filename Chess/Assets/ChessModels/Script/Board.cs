@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Board : MonoBehaviour
@@ -9,16 +10,16 @@ public class Board : MonoBehaviour
     
     private void Start()
     {
-       string initialStatePath = "Initial.json";
-       initialState = saveLoader.Load(initialStatePath);
+       initialState = saveLoader.Load();
        for (int i = 0; i < initialState.figureObjects.Length; i++)
             GenetateFigure(initialState.figureObjects[i], initialState.figurePositions[i]);
-       
     }
 
     private void GenetateFigure(GameObject figurePrefab,Vector3 position)
     {
         Instantiate(figurePrefab, position, Quaternion.identity, transform);
     }
+
+    
 }
 
