@@ -1,6 +1,7 @@
 
 using System;
 using UnityEngine;
+using System.Linq;
 
 public class Board : MonoBehaviour
 {
@@ -32,12 +33,29 @@ public class Board : MonoBehaviour
 
     private void TryMakeTurn(Vector2Int gridPoint)
     {
-        if (selectedFigure.Data.position == gridPoint)
+        Vector2Int initialPosition = selectedFigure.Data.position;
+        if ( initialPosition == gridPoint)
         {
-            selectedFigure.transform.position = new Vector3(gridPoint.x, 0, gridPoint.y);
+            selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
             selectedFigure = null;
             return;
         }
+        var figureOnPoint = FindObjectsOfType<Figure>().FirstOrDefault(x => x.Data.position == gridPoint);
+        if(figureOnPoint!=null)
+        {
+            if(figureOnPoint.Data.isWhite == isWhiteTurn)
+            {
+                selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
+                selectedFigure = null;
+                return;
+            }
+            else
+            {
+                Destroy(figureOnPoint.gameObject);
+            }
+            
+        }
+
         selectedFigure.Data.position = gridPoint;
         selectedFigure.transform.position = new Vector3(gridPoint.x, 0, gridPoint.y);
         selectedFigure = null;
