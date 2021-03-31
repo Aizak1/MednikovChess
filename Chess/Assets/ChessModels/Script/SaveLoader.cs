@@ -6,7 +6,7 @@ public class SaveLoader:MonoBehaviour
 {
     public void Save(BoardState boardState)
     {
-        string path = Path.Combine(Application.dataPath, "Save.json");
+        string path = Path.Combine(Application.dataPath, "Initial.json");
         using (StreamWriter streamWriter = new StreamWriter(path))
         {
             string json = JsonUtility.ToJson(boardState);

@@ -10,7 +10,7 @@ public class Board : MonoBehaviour
     
     private void Start()
     {
-       initialState = saveLoader.Load();
+        initialState = saveLoader.Load();
        for (int i = 0; i < initialState.figureObjects.Length; i++)
             GenetateFigure(initialState.figureObjects[i], initialState.figurePositions[i]);
     }
