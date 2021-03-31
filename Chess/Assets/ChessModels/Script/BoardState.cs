@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 [System.Serializable]
-public class BoardState
+public struct BoardState
 {
-    public Figure[] figures;
-    public BoardState(Figure[]figures)
+    public FigureData[] figuresData;
+    public BoardState(FigureData[]figures)
     {
-        this.figures = figures;
+        this.figuresData = figures;
     }
 }
 
