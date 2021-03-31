@@ -1,4 +1,5 @@
 
+using System;
 using UnityEngine;
 
 public class Board : MonoBehaviour
@@ -7,9 +8,11 @@ public class Board : MonoBehaviour
     [SerializeField] private GameObject[] initialModels;
     public BoardState initialState;
     private Figure selectedFigure;
+    private bool isWhiteTurn;
 
     private void Start()
     {
+        isWhiteTurn = true;
         initialState = saveLoader.Load();
         for (int i = 0; i < initialState.figuresData.Length; i++)
         {
@@ -18,7 +21,27 @@ public class Board : MonoBehaviour
     }
     private void Update()
     {
-        SelectTile();
+       SelectTile(out Vector2Int gridPoint);
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (selectedFigure != null)
+                TryMakeTurn(gridPoint);
+        }
+                  
+    }
+
+    private void TryMakeTurn(Vector2Int gridPoint)
+    {
+        if (selectedFigure.Data.position == gridPoint)
+        {
+            selectedFigure.transform.position = new Vector3(gridPoint.x, 0, gridPoint.y);
+            selectedFigure = null;
+            return;
+        }
+        selectedFigure.Data.position = gridPoint;
+        selectedFigure.transform.position = new Vector3(gridPoint.x, 0, gridPoint.y);
+        selectedFigure = null;
+        isWhiteTurn = !isWhiteTurn;
     }
 
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
@@ -27,37 +50,28 @@ public class Board : MonoBehaviour
         figureGameObject.GetComponent<Figure>().Data = data;
     }
 
-    private void SelectTile()
+    private void SelectTile(out Vector2Int gridPoint)
     {
+        gridPoint = Vector2Int.zero;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, LayerMask.GetMask("Board")))
         {
             Vector2 cellOffset = new Vector2(0.589f, 0.45f);
-            Vector2Int gridPoint = new Vector2Int((int)(hit.point.x + cellOffset.x), (int)(hit.point.z + cellOffset.y));
+             gridPoint = new Vector2Int((int)(hit.point.x + cellOffset.x), (int)(hit.point.z + cellOffset.y));
             if (Input.GetMouseButtonDown(0))
             {
-                if (hit.transform.gameObject.GetComponent<Figure>())
-                {
-                    float optimalFigureYOffset = 0.3f;
-                    if (selectedFigure == null)
-                    {
-                        selectedFigure = hit.transform.gameObject.GetComponent<Figure>();
-                        selectedFigure.transform.position = new Vector3(gridPoint.x, optimalFigureYOffset, gridPoint.y);
-                    }
-                    else
-                    {
-                        selectedFigure.transform.position = new Vector3(selectedFigure.transform.position.x, 0, selectedFigure.transform.position.z);
-                        selectedFigure = hit.transform.gameObject.GetComponent<Figure>();
-                        selectedFigure.transform.position = new Vector3(gridPoint.x, optimalFigureYOffset, gridPoint.y);
-                    }
-                }
-
+                var figure = hit.transform.gameObject.GetComponent<Figure>();
+                if (figure != null && figure.Data.isWhite == isWhiteTurn)
+                 selectedFigure = hit.transform.gameObject.GetComponent<Figure>();
             }
+            if (selectedFigure != null)
+                selectedFigure.transform.position = hit.point + Vector3.up;
 
         }
 
     }
+   
 
 
 }

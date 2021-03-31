@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class Figure : MonoBehaviour
 {
-    public FigureData Data { get; set; }
+    public FigureData Data;
 }
