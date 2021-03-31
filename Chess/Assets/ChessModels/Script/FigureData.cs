@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,11 +15,11 @@ public enum Kind
 [System.Serializable]
 public struct FigureData
 {
-   public Vector2Int position;
-   public bool isWhite;
-   public Kind kind;
+    public Vector2Int position;
+    public bool isWhite;
+    public Kind kind;
 
-    public FigureData(Vector2Int position, bool isWhite, Kind kind,GameObject model)
+    public FigureData(Vector2Int position, bool isWhite, Kind kind)
     {
         this.position = position;
         this.isWhite = isWhite;

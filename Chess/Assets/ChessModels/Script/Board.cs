@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+
 using UnityEngine;
 
 public class Board : MonoBehaviour
@@ -9,14 +7,13 @@ public class Board : MonoBehaviour
     [SerializeField] private GameObject[] initialModels;
     public BoardState initialState;
     private Figure selectedFigure;
-    
+
     private void Start()
     {
         initialState = saveLoader.Load();
         for (int i = 0; i < initialState.figuresData.Length; i++)
         {
-           initialModels[i].GetComponent<Figure>().Data = initialState.figuresData[i];
-           GenetateFigure(initialModels[i], initialState.figuresData[i].position);
+            GenetateFigure(initialModels[i], initialState.figuresData[i]);
         }
     }
     private void Update()
@@ -24,16 +21,17 @@ public class Board : MonoBehaviour
         SelectTile();
     }
 
-    private void GenetateFigure(GameObject figurePrefab,Vector2Int position)
+    private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
-        Instantiate(figurePrefab, new Vector3(position.x,0,position.y), Quaternion.identity);
+       var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
+        figureGameObject.GetComponent<Figure>().Data = data;
     }
 
     private void SelectTile()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit,LayerMask.GetMask("Board")))
+        if (Physics.Raycast(ray, out hit, LayerMask.GetMask("Board")))
         {
             Vector2 cellOffset = new Vector2(0.589f, 0.45f);
             Vector2Int gridPoint = new Vector2Int((int)(hit.point.x + cellOffset.x), (int)(hit.point.z + cellOffset.y));
@@ -54,13 +52,12 @@ public class Board : MonoBehaviour
                         selectedFigure.transform.position = new Vector3(gridPoint.x, optimalFigureYOffset, gridPoint.y);
                     }
                 }
-                
+
             }
-            
+
         }
-        
+
     }
 
-    
-}
 
+}
