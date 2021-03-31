@@ -31,16 +31,16 @@ public class Board : MonoBehaviour
                   
     }
 
-    private void TryMakeTurn(Vector2Int gridPoint)
+    private void TryMakeTurn(Vector2Int finalPosition)
     {
         Vector2Int initialPosition = selectedFigure.Data.position;
-        if ( initialPosition == gridPoint)
+        if ( initialPosition == finalPosition)
         {
             selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
             selectedFigure = null;
             return;
         }
-        var figureOnPoint = FindObjectsOfType<Figure>().FirstOrDefault(x => x.Data.position == gridPoint);
+        var figureOnPoint = FindObjectsOfType<Figure>().FirstOrDefault(x => x.Data.position == finalPosition);
         if(figureOnPoint!=null)
         {
             if(figureOnPoint.Data.isWhite == isWhiteTurn)
@@ -56,8 +56,8 @@ public class Board : MonoBehaviour
             
         }
 
-        selectedFigure.Data.position = gridPoint;
-        selectedFigure.transform.position = new Vector3(gridPoint.x, 0, gridPoint.y);
+        selectedFigure.Data.position = finalPosition;
+        selectedFigure.transform.position = new Vector3(finalPosition.x, 0, finalPosition.y);
         selectedFigure = null;
         isWhiteTurn = !isWhiteTurn;
     }
