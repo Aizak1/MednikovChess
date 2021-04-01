@@ -47,14 +47,15 @@ public class Board : MonoBehaviour
             return;
         }
         var figuresOnBoard = FindObjectsOfType<Figure>();
-        if (!selectedFigure.IsAbleToMove(figuresOnBoard,finalPosition))
+        var figureToCapture = figuresOnBoard.FirstOrDefault(x => x.Data.position == finalPosition);
+        if (!selectedFigure.IsAbleToMove(figureToCapture,finalPosition))
         {
             Deselect(initialPosition);
             return;
         }  
-        var figureOnPoint = figuresOnBoard.FirstOrDefault(x => x.Data.position == finalPosition);
-        if (figureOnPoint != null)
-            Destroy(figureOnPoint.gameObject);
+      
+        if (figureToCapture != null)
+            Destroy(figureToCapture.gameObject);
         selectedFigure.Data.position = finalPosition;
         selectedFigure.transform.position = new Vector3(finalPosition.x, 0, finalPosition.y);
         selectedFigure = null;

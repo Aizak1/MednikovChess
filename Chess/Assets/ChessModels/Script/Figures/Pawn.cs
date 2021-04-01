@@ -10,9 +10,8 @@ public class Pawn : Figure
     {
         firstTurn = true;
     }
-    public override bool IsAbleToMove(Figure[] figuresOnBoard,Vector2Int finalPosition)
+    public override bool IsAbleToMove(Figure figureToCapture, Vector2Int finalPosition)
     {
-        var figureToCapture = figuresOnBoard.FirstOrDefault(x => x.Data.position == finalPosition);
         Vector2Int delta = CalculateDelta(Data.position, finalPosition);
         if (Data.isWhite && finalPosition.y > Data.position.y || !Data.isWhite && finalPosition.y < Data.position.y)
         {

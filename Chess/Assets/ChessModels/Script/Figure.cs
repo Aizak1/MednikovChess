@@ -12,7 +12,7 @@ public abstract class Figure : MonoBehaviour
     protected Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
 
-    public abstract bool IsAbleToMove(Figure[] figuresOnBoard,Vector2Int gridPoint);
+    public abstract bool IsAbleToMove(Figure figureToCapture,Vector2Int gridPoint);
     
     protected Vector2Int CalculateDelta(Vector2Int initialPosition,Vector2Int finalPosition)
     {
