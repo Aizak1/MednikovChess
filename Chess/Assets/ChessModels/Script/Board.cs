@@ -8,7 +8,6 @@ public class Board : MonoBehaviour
     [SerializeField] private SaveLoader saveLoader;
     [SerializeField] private GameObject[] initialModels;
     [SerializeField] private GameObject tileHighlighter;
-    [SerializeField] private GameObject moveHighlighter;
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
     private bool isWhiteTurn;
@@ -47,19 +46,15 @@ public class Board : MonoBehaviour
             Deselect(initialPosition);
             return;
         }
-        Figure[] figuresOnBoard = FindObjectsOfType<Figure>();
-        var figureOnPoint = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
-        List<Vector2Int> allpossibleMoves = selectedFigure.GetAllMoves(figureOnPoint);
-        if (!allpossibleMoves.Contains(finalPosition))
+        var figuresOnBoard = FindObjectsOfType<Figure>();
+        if (!selectedFigure.IsAbleToMove(figuresOnBoard,finalPosition))
         {
             Deselect(initialPosition);
             return;
-        }
+        }  
+        var figureOnPoint = figuresOnBoard.FirstOrDefault(x => x.Data.position == finalPosition);
         if (figureOnPoint != null)
-        {
             Destroy(figureOnPoint.gameObject);
-        }
-
         selectedFigure.Data.position = finalPosition;
         selectedFigure.transform.position = new Vector3(finalPosition.x, 0, finalPosition.y);
         selectedFigure = null;
