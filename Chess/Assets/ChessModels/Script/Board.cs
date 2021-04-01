@@ -1,4 +1,3 @@
-
 using System;
 using UnityEngine;
 using System.Linq;
@@ -22,28 +21,28 @@ public class Board : MonoBehaviour
     }
     private void Update()
     {
-       SelectTile(out Vector2Int gridPoint);
+        SelectTile(out Vector2Int gridPoint);
         if (Input.GetMouseButtonUp(0))
         {
             if (selectedFigure != null)
                 TryMakeTurn(gridPoint);
         }
-                  
+
     }
 
     private void TryMakeTurn(Vector2Int finalPosition)
     {
         Vector2Int initialPosition = selectedFigure.Data.position;
-        if ( initialPosition == finalPosition)
+        if (initialPosition == finalPosition)
         {
             selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
             selectedFigure = null;
             return;
         }
         var figureOnPoint = FindObjectsOfType<Figure>().FirstOrDefault(x => x.Data.position == finalPosition);
-        if(figureOnPoint!=null)
+        if (figureOnPoint != null)
         {
-            if(figureOnPoint.Data.isWhite == isWhiteTurn)
+            if (figureOnPoint.Data.isWhite == isWhiteTurn)
             {
                 selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
                 selectedFigure = null;
@@ -53,7 +52,7 @@ public class Board : MonoBehaviour
             {
                 Destroy(figureOnPoint.gameObject);
             }
-            
+
         }
 
         selectedFigure.Data.position = finalPosition;
@@ -64,7 +63,7 @@ public class Board : MonoBehaviour
 
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
-       var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
+        var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
         figureGameObject.GetComponent<Figure>().Data = data;
     }
 
@@ -75,13 +74,14 @@ public class Board : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, LayerMask.GetMask("Board")))
         {
-            Vector2 cellOffset = new Vector2(0.589f, 0.45f);
-             gridPoint = new Vector2Int((int)(hit.point.x + cellOffset.x), (int)(hit.point.z + cellOffset.y));
+            Vector2 cellOffset = new Vector2(0.565f, 0.45f);
+            gridPoint = new Vector2Int((int)(hit.point.x+cellOffset.x), (int)(hit.point.z+cellOffset.y));
+            
             if (Input.GetMouseButtonDown(0))
             {
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
                 if (figure != null && figure.Data.isWhite == isWhiteTurn)
-                 selectedFigure = hit.transform.gameObject.GetComponent<Figure>();
+                    selectedFigure = hit.transform.gameObject.GetComponent<Figure>();
             }
             if (selectedFigure != null)
                 selectedFigure.transform.position = hit.point + Vector3.up;
@@ -89,7 +89,7 @@ public class Board : MonoBehaviour
         }
 
     }
-   
+
 
 
 }

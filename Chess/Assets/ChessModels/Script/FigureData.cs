@@ -18,7 +18,6 @@ public struct FigureData
     public Vector2Int position;
     public bool isWhite;
     public Kind kind;
-
     public FigureData(Vector2Int position, bool isWhite, Kind kind)
     {
         this.position = position;
