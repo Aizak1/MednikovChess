@@ -6,7 +6,8 @@ public class Board : MonoBehaviour
 {
     [SerializeField] private SaveLoader saveLoader;
     [SerializeField] private GameObject[] initialModels;
-    public BoardState initialState;
+    [SerializeField] private GameObject tileHighlighter;
+    [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
     private bool isWhiteTurn;
 
@@ -76,12 +77,14 @@ public class Board : MonoBehaviour
         {
             Vector2 cellOffset = new Vector2(0.565f, 0.45f);
             gridPoint = new Vector2Int((int)(hit.point.x+cellOffset.x), (int)(hit.point.z+cellOffset.y));
-            
+            tileHighlighter.SetActive(true);
+            Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
+            tileHighlighter.transform.position = new Vector3(gridPoint.x+tileHighlighterOffset.x, tileHighlighterOffset.y, gridPoint.y+tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
                 if (figure != null && figure.Data.isWhite == isWhiteTurn)
-                    selectedFigure = hit.transform.gameObject.GetComponent<Figure>();
+                    selectedFigure = figure;
             }
             if (selectedFigure != null)
                 selectedFigure.transform.position = hit.point + Vector3.up;
