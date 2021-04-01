@@ -22,11 +22,11 @@ public class Board : MonoBehaviour
     }
     private void Update()
     {
-        SelectTile(out Vector2Int gridPoint);
+        SelectTile(out Vector2Int mouseDownPosition);
         if (Input.GetMouseButtonUp(0))
         {
             if (selectedFigure != null)
-                TryMakeTurn(gridPoint);
+                TryMakeTurn(mouseDownPosition);
         }
 
     }
@@ -68,18 +68,18 @@ public class Board : MonoBehaviour
         figureGameObject.GetComponent<Figure>().Data = data;
     }
 
-    private void SelectTile(out Vector2Int gridPoint)
+    private void SelectTile(out Vector2Int mouseDownPosition)
     {
-        gridPoint = Vector2Int.zero;
+        mouseDownPosition = Vector2Int.zero-Vector2Int.one;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, LayerMask.GetMask("Board")))
         {
             Vector2 cellOffset = new Vector2(0.565f, 0.45f);
-            gridPoint = new Vector2Int((int)(hit.point.x+cellOffset.x), (int)(hit.point.z+cellOffset.y));
+            mouseDownPosition = new Vector2Int((int)(hit.point.x+cellOffset.x), (int)(hit.point.z+cellOffset.y));
             tileHighlighter.SetActive(true);
             Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
-            tileHighlighter.transform.position = new Vector3(gridPoint.x+tileHighlighterOffset.x, tileHighlighterOffset.y, gridPoint.y+tileHighlighterOffset.z);
+            tileHighlighter.transform.position = new Vector3(mouseDownPosition.x+tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y+tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
