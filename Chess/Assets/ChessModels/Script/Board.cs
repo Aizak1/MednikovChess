@@ -1,15 +1,18 @@
 using System;
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 public class Board : MonoBehaviour
 {
     [SerializeField] private SaveLoader saveLoader;
     [SerializeField] private GameObject[] initialModels;
     [SerializeField] private GameObject tileHighlighter;
+    [SerializeField] private GameObject moveHighlighter;
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
     private bool isWhiteTurn;
+    private Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
 
     private void Start()
     {
@@ -34,32 +37,39 @@ public class Board : MonoBehaviour
     private void TryMakeTurn(Vector2Int finalPosition)
     {
         Vector2Int initialPosition = selectedFigure.Data.position;
-        if (initialPosition == finalPosition)
+        if(finalPosition.x<0 || finalPosition.x>7 || finalPosition.y<0 || finalPosition.y > 7)
         {
-            selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
-            selectedFigure = null;
+            Deselect(initialPosition);
             return;
         }
-        var figureOnPoint = FindObjectsOfType<Figure>().FirstOrDefault(x => x.Data.position == finalPosition);
+        if (initialPosition == finalPosition)
+        {
+            Deselect(initialPosition);
+            return;
+        }
+        Figure[] figuresOnBoard = FindObjectsOfType<Figure>();
+        var figureOnPoint = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
+        List<Vector2Int> allpossibleMoves = selectedFigure.GetAllMoves(figureOnPoint);
+        if (!allpossibleMoves.Contains(finalPosition))
+        {
+            Deselect(initialPosition);
+            return;
+        }
         if (figureOnPoint != null)
         {
-            if (figureOnPoint.Data.isWhite == isWhiteTurn)
-            {
-                selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
-                selectedFigure = null;
-                return;
-            }
-            else
-            {
-                Destroy(figureOnPoint.gameObject);
-            }
-
+            Destroy(figureOnPoint.gameObject);
         }
 
         selectedFigure.Data.position = finalPosition;
         selectedFigure.transform.position = new Vector3(finalPosition.x, 0, finalPosition.y);
         selectedFigure = null;
         isWhiteTurn = !isWhiteTurn;
+    }
+
+    private void Deselect(Vector2Int initialPosition)
+    {
+        selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
+        selectedFigure = null;
     }
 
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
@@ -78,7 +88,6 @@ public class Board : MonoBehaviour
             Vector2 cellOffset = new Vector2(0.565f, 0.45f);
             mouseDownPosition = new Vector2Int((int)(hit.point.x+cellOffset.x), (int)(hit.point.z+cellOffset.y));
             tileHighlighter.SetActive(true);
-            Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
             tileHighlighter.transform.position = new Vector3(mouseDownPosition.x+tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y+tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {

@@ -268,6 +268,7 @@ MonoBehaviour:
   - {fileID: 196802, guid: b6c7ad354ac474944ba26b2895a59759, type: 3}
   - {fileID: 125018, guid: 9d3e9c36668dcfe44b524760a4c3a3b5, type: 3}
   tileHighlighter: {fileID: 427831541}
+  moveHighlighter: {fileID: 0}
   initialState:
     figuresData:
     - position: {x: 0, y: 1}
@@ -630,7 +631,7 @@ GameObject:
   - component: {fileID: 2737577599420327341}
   - component: {fileID: 1407672485291297488}
   - component: {fileID: 2373189291191365459}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
