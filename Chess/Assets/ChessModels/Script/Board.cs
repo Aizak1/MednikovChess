@@ -11,7 +11,6 @@ public class Board : MonoBehaviour
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
     private bool isWhiteTurn;
-    private Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
 
     private void Start()
     {
@@ -47,7 +46,7 @@ public class Board : MonoBehaviour
             return;
         }
         var figuresOnBoard = FindObjectsOfType<Figure>();
-        var figureToCapture = figuresOnBoard.FirstOrDefault(x => x.Data.position == finalPosition);
+        var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
         if (!selectedFigure.IsAbleToMove(figureToCapture,finalPosition))
         {
             Deselect(initialPosition);
@@ -84,6 +83,7 @@ public class Board : MonoBehaviour
             Vector2 cellOffset = new Vector2(0.565f, 0.45f);
             mouseDownPosition = new Vector2Int((int)(hit.point.x+cellOffset.x), (int)(hit.point.z+cellOffset.y));
             tileHighlighter.SetActive(true);
+            Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
             tileHighlighter.transform.position = new Vector3(mouseDownPosition.x+tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y+tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {
