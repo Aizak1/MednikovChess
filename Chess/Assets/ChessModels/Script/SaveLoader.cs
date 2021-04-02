@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class SaveLoader:MonoBehaviour
 {
-    public void Save(BoardState boardState)
+    public void Save()
     {
+        BoardState boardState;
+        boardState.figuresData = FindObjectsOfType<Figure>().Select(figure => figure.Data).ToArray();
         string path = Path.Combine(Application.dataPath, "Save.json");
         using (StreamWriter streamWriter = new StreamWriter(path))
         {

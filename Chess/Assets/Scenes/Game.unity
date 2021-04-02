@@ -233,14 +233,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5749e85e867a6f74aa7eba511e0e02c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  saveLoader: {fileID: 1349827205}
   tileHighlighter: {fileID: 427831541}
   modelMatcher: {fileID: 1410640660}
-  initialState:
-    figuresData:
-    - position: {x: 0, y: 0}
-      isWhite: 0
-      kind: 0
 --- !u!1 &427831541 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1333511979136996, guid: e860aff6f484c47d7b713cbebd3ee5d3, type: 3}
@@ -451,6 +445,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43a104f3dd09deb43b8139d89e28a988, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  board: {fileID: 389533355}
 --- !u!4 &1349827206
 Transform:
   m_ObjectHideFlags: 0

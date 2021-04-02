@@ -52,16 +52,19 @@ public class Board : MonoBehaviour
         selectedFigure = null;
         isWhiteTurn = !isWhiteTurn;
     }
+
     private void Deselect(Vector2Int initialPosition)
     {
         selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
         selectedFigure = null;
     }
+
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
         figureGameObject.GetComponent<Figure>().Data = data;
     }
+
     private void SelectTile(out Vector2Int mouseDownPosition)
     {
         mouseDownPosition = Vector2Int.zero-Vector2Int.one;

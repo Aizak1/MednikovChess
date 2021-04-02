@@ -19,7 +19,7 @@ public class ModelMathcer:MonoBehaviour
     [SerializeField] private GameObject blackKingModel;
     private Dictionary<Tuple<Kind, bool>, GameObject> kindModelPairs;
     public Dictionary<Tuple<Kind, bool>, GameObject> KindModelPairs => kindModelPairs;
-    private void Start()
+    private void Awake()
     {
         //В качестве bool передается значение isWhite 
         kindModelPairs = new Dictionary<Tuple<Kind, bool>, GameObject>()
