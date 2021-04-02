@@ -3,43 +3,82 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public abstract class Figure : MonoBehaviour
+public class Figure : MonoBehaviour
 {
     public FigureData Data;
-
-    protected Vector2Int[] rookDirections = {new Vector2Int(0,1), new Vector2Int(1, 0),
+    private Vector2Int[] rookDirections = {new Vector2Int(0,1), new Vector2Int(1, 0),
         new Vector2Int(0, -1), new Vector2Int(-1, 0)};
-    protected Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
+    private Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
-
-    public abstract bool IsAbleToMove(Figure figureToCapture,Vector2Int gridPoint);
-
-    protected bool DirectionalFigureIsAbleToMove(Figure figureToCapture, Vector2Int gridPoint,Vector2Int[] allPossibleDirections)
+    public bool IsAbleToMove(Figure[] board,Figure figureToCapture,Vector2Int finalPosition)
     {
-        Vector2Int[] figuresPositions = FindObjectsOfType<Figure>().Select(figure => figure.Data.position).ToArray();
+        var delta = new Vector2Int(Mathf.Abs(finalPosition.x - Data.position.x), Mathf.Abs(finalPosition.y - Data.position.y));
+        Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
+        bool canMove = false;
+        switch (Data.kind)
+        {
+            case Kind.Pawn:
+                if (Data.isWhite && finalPosition.y > Data.position.y || !Data.isWhite && finalPosition.y < Data.position.y)
+                {
+                    if (figureToCapture == null)
+                    {
+                        if (Data.isWhite && Data.position.y == 1 || !Data.isWhite && Data.position.y == 6 )
+                            if (delta.x == 0 && delta.y == 2)
+                                canMove = true;
+                        if (delta.x == 0 && delta.y == 1)
+                            canMove = true;
+                    }
+                    else
+                    {
+                        if (delta == Vector2Int.one && figureToCapture.Data.isWhite != Data.isWhite)
+                            canMove = true;
+                    }
+                }
+                break;
+            case Kind.Rook:
+                canMove =  IsDirectionalFigureAbleToMove(board, figureToCapture, finalPosition, rookDirections);
+                break;
+            case Kind.Knight:
+                if ((delta.x == 1 && delta.y == 2) || (delta.x == 2 && delta.y == 1))
+                    if (figureToCapture == null || figureToCapture.Data.isWhite != Data.isWhite)
+                        canMove =  true;
+                break;
+            case Kind.Bishop:
+                canMove =  IsDirectionalFigureAbleToMove(board, figureToCapture, finalPosition, bishopDirections);
+                break;
+            case Kind.Queen:
+                canMove =  IsDirectionalFigureAbleToMove(board, figureToCapture, finalPosition, allDirections);
+                break;
+            case Kind.King:
+                if (figureToCapture == null || figureToCapture.Data.isWhite != Data.isWhite)
+                    canMove = allDirections.Contains(delta);
+                break;
+        }
+        return canMove;
+    }
+    private bool IsDirectionalFigureAbleToMove(Figure[]board,Figure figureToCapture, Vector2Int finalPosition,Vector2Int[] allPossibleDirections)
+    {
+        Vector2Int[] figuresPositions = board.Select(figure => figure.Data.position).ToArray();
         if (figureToCapture != null && figureToCapture.Data.isWhite == Data.isWhite)
             return false;
-        var initialCoordinate = Data.position;
-        var delta = (Vector2)(gridPoint - initialCoordinate);
-        var directionalStep = new Vector2Int((int)delta.normalized.x, (int)delta.normalized.y);
+        var initialPosition = Data.position;
+        var direction = ((Vector2)finalPosition - initialPosition).normalized;
+        if(direction.x != 0 && direction.y != 0 && Mathf.Abs(direction.x) != Mathf.Abs(direction.y))
+            return false;
+        int directionalStepX = direction.x == 0 ? 0 : (int)(direction.x / Mathf.Abs(direction.x));
+        int directionalStepY = direction.y == 0 ? 0 : (int)(direction.y / Mathf.Abs(direction.y));
+        var directionalStep = new Vector2Int(directionalStepX,directionalStepY);
         if (allPossibleDirections.Contains(directionalStep))
         {
-            initialCoordinate += directionalStep;
-            while (initialCoordinate != gridPoint)
+            initialPosition += directionalStep;
+            while (initialPosition != finalPosition)
             {
-                if (figuresPositions.Contains(initialCoordinate))
+                if (figuresPositions.Contains(initialPosition))
                     return false;
-                initialCoordinate += directionalStep;
+                initialPosition += directionalStep;       
             }
             return true;
         }
-
         return false;
     }
-    
-    protected Vector2Int CalculateDelta(Vector2Int initialPosition,Vector2Int finalPosition)
-    {
-        return new Vector2Int(Mathf.Abs(finalPosition.x - initialPosition.x), Mathf.Abs(finalPosition.y - initialPosition.y));
-    }
-   
 }

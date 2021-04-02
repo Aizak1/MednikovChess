@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3341154}
   - component: {fileID: 2397982}
   - component: {fileID: 6465112}
-  - component: {fileID: 7784837818746606875}
+  - component: {fileID: 5147420655974342252}
   m_Layer: 0
   m_Name: White Rook
   m_TagString: Untagged
@@ -97,7 +97,7 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 695bd15b69d9eac408b599c22f9de55d, type: 3}
---- !u!114 &7784837818746606875
+--- !u!114 &5147420655974342252
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 114028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f51085867fa450843a9e11620d843e76, type: 3}
+  m_Script: {fileID: 11500000, guid: 19864b4930ebf554f8d18ea378129390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Data:
