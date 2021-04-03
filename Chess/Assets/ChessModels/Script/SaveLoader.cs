@@ -1,9 +1,21 @@
 ﻿using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SaveLoader:MonoBehaviour
 {
+    public BoardState LoadState(string path)
+    {
+        string validpath = Path.Combine(Application.dataPath, path);
+        using (StreamReader reader = new StreamReader(validpath))
+        {
+            string json = reader.ReadToEnd();
+            BoardState boardState = JsonUtility.FromJson<BoardState>(json);
+            return boardState;
+        }
+    }
+    #region Методы для UI
     public void Save()
     {
         BoardState boardState;
@@ -15,14 +27,21 @@ public class SaveLoader:MonoBehaviour
             streamWriter.Write(json);
         }
     }
-    public BoardState Load(string path = "Initial.json")
+    public void NewGame()
     {
-        string validpath = Path.Combine(Application.dataPath, path);
-        using (StreamReader reader = new StreamReader(validpath))
-        {
-            string json = reader.ReadToEnd();
-            BoardState boardState = JsonUtility.FromJson<BoardState>(json);
-            return boardState;
-        }
+        Board.CurrentGameState = GameState.NotStarted;
+        SceneManager.LoadScene("Game");
     }
+    public void LoadGame()
+    {
+        Board.CurrentGameState = GameState.Continues;
+        SceneManager.LoadScene("Game");
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
+    #endregion
+
 }

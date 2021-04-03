@@ -2,6 +2,12 @@ using System;
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+public enum GameState
+{
+    NotStarted,
+    Continues,
+    Finished
+}
 public class Board : MonoBehaviour
 {
     [SerializeField] private SaveLoader saveLoader;
@@ -10,10 +16,14 @@ public class Board : MonoBehaviour
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
     private bool isWhiteTurn;
+    public static GameState CurrentGameState { get; set; }
     private void Start()
     {
         isWhiteTurn = true;
-        initialState = saveLoader.Load();
+        if (CurrentGameState == GameState.NotStarted)
+            initialState = saveLoader.LoadState("Initial.json");
+        else if (CurrentGameState == GameState.Continues)
+            initialState = saveLoader.LoadState("Save.json");
         for (int i = 0; i < initialState.figuresData.Length; i++)
             GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind,initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
     }
@@ -52,19 +62,16 @@ public class Board : MonoBehaviour
         selectedFigure = null;
         isWhiteTurn = !isWhiteTurn;
     }
-
     private void Deselect(Vector2Int initialPosition)
     {
         selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
         selectedFigure = null;
     }
-
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
         figureGameObject.GetComponent<Figure>().Data = data;
     }
-
     private void SelectTile(out Vector2Int mouseDownPosition)
     {
         mouseDownPosition = Vector2Int.zero-Vector2Int.one;
