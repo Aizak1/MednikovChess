@@ -15,17 +15,17 @@ public class Board : MonoBehaviour
     [SerializeField] private ModelMathcer modelMatcher;
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
-    private bool isWhiteTurn;
+    public bool IsWhiteTurn { get; private set; }
     public static GameState CurrentGameState { get; set; }
     private void Start()
     {
-        isWhiteTurn = true;
         if (CurrentGameState == GameState.NotStarted)
             initialState = saveLoader.LoadState("Initial.json");
         else if (CurrentGameState == GameState.Continues)
             initialState = saveLoader.LoadState("Save.json");
         for (int i = 0; i < initialState.figuresData.Length; i++)
             GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind,initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
+        IsWhiteTurn = initialState.isWhiteTurn;
     }
     private void Update()
     {
@@ -48,6 +48,7 @@ public class Board : MonoBehaviour
             return;
         }
         var figuresOnBoard = FindObjectsOfType<Figure>();
+
         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
         if (!selectedFigure.IsAbleToMove(figuresOnBoard,figureToCapture,finalPosition))
         {
@@ -60,7 +61,7 @@ public class Board : MonoBehaviour
         selectedFigure.Data.position = finalPosition;
         selectedFigure.transform.position = new Vector3(finalPosition.x, 0, finalPosition.y);
         selectedFigure = null;
-        isWhiteTurn = !isWhiteTurn;
+        IsWhiteTurn = !IsWhiteTurn;
     }
     private void Deselect(Vector2Int initialPosition)
     {
@@ -87,7 +88,7 @@ public class Board : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
-                if (figure != null && figure.Data.isWhite == isWhiteTurn)
+                if (figure != null && figure.Data.isWhite == IsWhiteTurn)
                     selectedFigure = figure;
             }
             if (selectedFigure != null)

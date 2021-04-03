@@ -257,5 +257,6 @@
       "isWhite": false,
       "kind": 1
     }
-  ]
+  ],
+  "isWhiteTurn": true
 }

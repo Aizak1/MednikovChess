@@ -19,7 +19,9 @@ public class SaveLoader:MonoBehaviour
     public void Save()
     {
         BoardState boardState;
+        Board board = FindObjectOfType<Board>();
         boardState.figuresData = FindObjectsOfType<Figure>().Select(figure => figure.Data).ToArray();
+        boardState.isWhiteTurn = board.IsWhiteTurn;
         string path = Path.Combine(Application.dataPath, "Save.json");
         using (StreamWriter streamWriter = new StreamWriter(path))
         {

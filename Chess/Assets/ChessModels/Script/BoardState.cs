@@ -3,9 +3,11 @@
 public struct BoardState
 {
     public FigureData[] figuresData;
-    public BoardState(FigureData[]figures)
+    public bool isWhiteTurn;
+    public BoardState(FigureData[] figuresData, bool isWhiteTurn)
     {
-        this.figuresData = figures;
+        this.figuresData = figuresData;
+        this.isWhiteTurn = isWhiteTurn;
     }
 }
 
