@@ -2,7 +2,6 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 public class SaveLoader:MonoBehaviour
 {
     public BoardState LoadState(string path)
@@ -45,5 +44,4 @@ public class SaveLoader:MonoBehaviour
         Application.Quit();
     }
     #endregion
-
 }

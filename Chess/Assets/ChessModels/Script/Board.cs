@@ -55,8 +55,6 @@ public class Board : MonoBehaviour
     {
         Vector2Int initialPosition = selectedFigure.Data.position;
         var figuresOnBoard = FindObjectsOfType<Figure>();
-        var currentTurnFigures = figuresOnBoard.Where(figure => figure.Data.isWhite == IsWhiteTurn).ToArray();
-        var opponentKing = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.King && figure.Data.isWhite != IsWhiteTurn);
         if (!selectedFigure.IsAbleToMove(figuresOnBoard, finalPosition, out Figure figureToCapture))
         {
             selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
