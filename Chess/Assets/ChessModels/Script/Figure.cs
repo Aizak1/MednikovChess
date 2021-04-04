@@ -6,14 +6,16 @@ using System.Linq;
 public class Figure : MonoBehaviour
 {
     public FigureData Data;
-    private Vector2Int[] rookDirections = {new Vector2Int(0,1), new Vector2Int(1, 0),
+    private readonly static Vector2Int[] rookDirections = {new Vector2Int(0,1), new Vector2Int(1, 0),
         new Vector2Int(0, -1), new Vector2Int(-1, 0)};
-    private Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
+    private readonly static Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
-    public bool IsAbleToMove(Figure[] board,Figure figureToCapture,Vector2Int finalPosition)
+    private readonly static Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
+    public static Vector2Int[] AllDirections => allDirections;
+    public bool IsAbleToMove(Figure[] board,Vector2Int finalPosition,out Figure figureToCapture)
     {
+        figureToCapture = board.FirstOrDefault(figure => figure.Data.position == finalPosition);
         var delta = new Vector2Int(Mathf.Abs(finalPosition.x - Data.position.x), Mathf.Abs(finalPosition.y - Data.position.y));
-        Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
         bool canMove = false;
         switch (Data.kind)
         {

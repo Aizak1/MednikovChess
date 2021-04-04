@@ -24,12 +24,29 @@ public class Board : MonoBehaviour
         else if (CurrentGameState == GameState.Continues)
             initialState = saveLoader.LoadState("Save.json");
         for (int i = 0; i < initialState.figuresData.Length; i++)
-            GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind,initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
+            GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind, initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
         IsWhiteTurn = initialState.isWhiteTurn;
     }
     private void Update()
     {
-        SelectTile(out Vector2Int mouseDownPosition);
+        Vector2Int mouseDownPosition = Vector2Int.zero - Vector2Int.one;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Board")))
+        {
+            Vector2 cellOffset = new Vector2(0.565f, 0.45f);
+            mouseDownPosition = new Vector2Int((int)(hit.point.x + cellOffset.x), (int)(hit.point.z + cellOffset.y));
+            tileHighlighter.SetActive(true);
+            Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
+            tileHighlighter.transform.position = new Vector3(mouseDownPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y + tileHighlighterOffset.z);
+            if (Input.GetMouseButtonDown(0))
+            {
+                var figure = hit.transform.gameObject.GetComponent<Figure>();
+                if (figure != null && figure.Data.isWhite == IsWhiteTurn)
+                    selectedFigure = figure;
+            }
+            if (selectedFigure != null)
+                selectedFigure.transform.position = hit.point + Vector3.up;
+        }
         if (Input.GetMouseButtonUp(0))
             if (selectedFigure != null)
                 TryMakeTurn(mouseDownPosition);
@@ -48,14 +65,11 @@ public class Board : MonoBehaviour
             return;
         }
         var figuresOnBoard = FindObjectsOfType<Figure>();
-
-        var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
-        if (!selectedFigure.IsAbleToMove(figuresOnBoard,figureToCapture,finalPosition))
+        if (!selectedFigure.IsAbleToMove(figuresOnBoard,finalPosition,out Figure figureToCapture))
         {
             Deselect(initialPosition);
             return;
         }  
-      
         if (figureToCapture != null)
             Destroy(figureToCapture.gameObject);
         selectedFigure.Data.position = finalPosition;
@@ -72,27 +86,5 @@ public class Board : MonoBehaviour
     {
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
         figureGameObject.GetComponent<Figure>().Data = data;
-    }
-    private void SelectTile(out Vector2Int mouseDownPosition)
-    {
-        mouseDownPosition = Vector2Int.zero-Vector2Int.one;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, LayerMask.GetMask("Board")))
-        {
-            Vector2 cellOffset = new Vector2(0.565f, 0.45f);
-            mouseDownPosition = new Vector2Int((int)(hit.point.x+cellOffset.x), (int)(hit.point.z+cellOffset.y));
-            tileHighlighter.SetActive(true);
-            Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
-            tileHighlighter.transform.position = new Vector3(mouseDownPosition.x+tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y+tileHighlighterOffset.z);
-            if (Input.GetMouseButtonDown(0))
-            {
-                var figure = hit.transform.gameObject.GetComponent<Figure>();
-                if (figure != null && figure.Data.isWhite == IsWhiteTurn)
-                    selectedFigure = figure;
-            }
-            if (selectedFigure != null)
-                selectedFigure.transform.position = hit.point + Vector3.up;
-        }
     }
 }
