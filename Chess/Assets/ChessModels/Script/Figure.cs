@@ -15,6 +15,10 @@ public class Figure : MonoBehaviour
     public bool IsAbleToMove(Figure[] board,Vector2Int finalPosition,out Figure figureToCapture)
     {
         figureToCapture = board.FirstOrDefault(figure => figure.Data.position == finalPosition);
+        if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
+            return false;
+        if (Data.position == finalPosition)
+            return false;
         var delta = new Vector2Int(Mathf.Abs(finalPosition.x - Data.position.x), Mathf.Abs(finalPosition.y - Data.position.y));
         bool canMove = false;
         switch (Data.kind)

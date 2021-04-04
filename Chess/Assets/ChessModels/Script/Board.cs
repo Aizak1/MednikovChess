@@ -54,33 +54,21 @@ public class Board : MonoBehaviour
     private void TryMakeTurn(Vector2Int finalPosition)
     {
         Vector2Int initialPosition = selectedFigure.Data.position;
-        if(finalPosition.x<0 || finalPosition.x>7 || finalPosition.y<0 || finalPosition.y > 7)
-        {
-            Deselect(initialPosition);
-            return;
-        }
-        if (initialPosition == finalPosition)
-        {
-            Deselect(initialPosition);
-            return;
-        }
         var figuresOnBoard = FindObjectsOfType<Figure>();
-        if (!selectedFigure.IsAbleToMove(figuresOnBoard,finalPosition,out Figure figureToCapture))
+        var currentTurnFigures = figuresOnBoard.Where(figure => figure.Data.isWhite == IsWhiteTurn).ToArray();
+        var opponentKing = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.King && figure.Data.isWhite != IsWhiteTurn);
+        if (!selectedFigure.IsAbleToMove(figuresOnBoard, finalPosition, out Figure figureToCapture))
         {
-            Deselect(initialPosition);
+            selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
+            selectedFigure = null;
             return;
-        }  
+        }
         if (figureToCapture != null)
             Destroy(figureToCapture.gameObject);
         selectedFigure.Data.position = finalPosition;
         selectedFigure.transform.position = new Vector3(finalPosition.x, 0, finalPosition.y);
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
-    }
-    private void Deselect(Vector2Int initialPosition)
-    {
-        selectedFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
-        selectedFigure = null;
     }
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
