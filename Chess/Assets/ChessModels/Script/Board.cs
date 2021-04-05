@@ -43,12 +43,6 @@ public class Board : MonoBehaviour
             tileHighlighter.transform.position = new Vector3(mouseDownPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y + tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {
-                for (int i = 0; i < figuresOnBoard.Count; i++)
-                {
-                    if (figuresOnBoard[i] == null)
-                        figuresOnBoard.RemoveAt(i);
-                        
-                }
                 currentTurnMoves = GetAllMyMoves(figuresOnBoard);
                 if(currentTurnMoves.Count == 0)
                 {
@@ -119,11 +113,13 @@ public class Board : MonoBehaviour
         }
         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
         if (figureToCapture != null)
+        {
+            figuresOnBoard.Remove(figureToCapture);
             Destroy(figureToCapture.gameObject);
+        } 
         move.CurrentFigure.Data.position = move.FinalPosition;
         move.CurrentFigure.transform.position = new Vector3(move.FinalPosition.x, 0, move.FinalPosition.y);
         selectedFigure = null;
-        figuresOnBoard = FindObjectsOfType<Figure>().ToList();
         IsWhiteTurn = !IsWhiteTurn;
     }
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
