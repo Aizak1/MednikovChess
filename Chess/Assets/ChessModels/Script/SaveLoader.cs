@@ -38,7 +38,10 @@ public class SaveLoader:MonoBehaviour
         Board.CurrentGameState = GameState.Continues;
         SceneManager.LoadScene("Game");
     }
-
+    public void LoadMenu()
+    {
+        SceneManager.LoadScene("Menu");
+    }
     public void Quit()
     {
         Application.Quit();

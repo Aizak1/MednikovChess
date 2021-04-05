@@ -32,6 +32,8 @@ public class Board : MonoBehaviour
     }
     private void Update()
     {
+        if (CurrentGameState == GameState.Finished)
+            return;
         Vector2Int mouseDownPosition = Vector2Int.zero - Vector2Int.one;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Board")))
@@ -43,12 +45,7 @@ public class Board : MonoBehaviour
             tileHighlighter.transform.position = new Vector3(mouseDownPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y + tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {
-                currentTurnMoves = GetAllMyMoves(figuresOnBoard);
-                if(currentTurnMoves.Count == 0)
-                {
-                    CurrentGameState = GameState.Finished;
-                    return;
-                }
+                currentTurnMoves = GetAllCurrentTurnMoves(figuresOnBoard);
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
                 bool figureIsAbleToMove = currentTurnMoves.Select(move => move.CurrentFigure).ToList().Contains(figure);
                 if (figure != null && figure.Data.isWhite == IsWhiteTurn && figureIsAbleToMove)
@@ -62,7 +59,7 @@ public class Board : MonoBehaviour
             if (selectedFigure != null)
                 TryMakeTurn(new Move(selectedFigure,mouseDownPosition));
     }
-    private List<Move> GetAllMyMoves(List<Figure> figuresOnBoard)
+    private List<Move> GetAllCurrentTurnMoves(List<Figure> figuresOnBoard)
     {
         List<Move> possibleMoves = new List<Move>();
         var myFigures = figuresOnBoard.Where(figure => figure.Data.isWhite == IsWhiteTurn).ToArray();
@@ -121,6 +118,9 @@ public class Board : MonoBehaviour
         move.CurrentFigure.transform.position = new Vector3(move.FinalPosition.x, 0, move.FinalPosition.y);
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
+        if (GetAllCurrentTurnMoves(figuresOnBoard).Count == 0)
+            CurrentGameState = GameState.Finished;
+        
     }
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
