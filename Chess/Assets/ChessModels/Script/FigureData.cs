@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 public enum Kind
 {
     Pawn,
@@ -22,4 +23,5 @@ public struct FigureData
      this.isWhite = isWhite;
      this.kind = kind;
    }
+    
 }

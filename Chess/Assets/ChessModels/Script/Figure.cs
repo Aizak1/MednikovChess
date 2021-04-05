@@ -11,13 +11,14 @@ public class Figure : MonoBehaviour
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
     private readonly static Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
     public static Vector2Int[] AllDirections => allDirections;
-    public bool IsAbleToMove(Figure[] board,Vector2Int finalPosition,out Figure figureToCapture)
+  
+    public bool IsAbleToMove(List<Figure> board,Vector2Int finalPosition)
     {
-        figureToCapture = board.FirstOrDefault(figure => figure.Data.position == finalPosition);
         if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
             return false;
         if (Data.position == finalPosition)
             return false;
+        var figureToCapture = board.FirstOrDefault(figure => figure.Data.position == finalPosition);
         var delta = new Vector2Int(Mathf.Abs(finalPosition.x - Data.position.x), Mathf.Abs(finalPosition.y - Data.position.y));
         bool canMove = false;
         switch (Data.kind)
@@ -61,7 +62,7 @@ public class Figure : MonoBehaviour
         }
         return canMove;
     }
-    private bool IsDirectionalFigureAbleToMove(Figure[]board,Figure figureToCapture, Vector2Int finalPosition,Vector2Int[] allPossibleDirections)
+    private bool IsDirectionalFigureAbleToMove(List<Figure>board,Figure figureToCapture, Vector2Int finalPosition,Vector2Int[] allPossibleDirections)
     {
         Vector2Int[] figuresPositions = board.Select(figure => figure.Data.position).ToArray();
         if (figureToCapture != null && figureToCapture.Data.isWhite == Data.isWhite)
@@ -86,4 +87,5 @@ public class Figure : MonoBehaviour
         }
         return false;
     }
+   
 }
