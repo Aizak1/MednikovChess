@@ -44,8 +44,9 @@ public class Board : MonoBehaviour
                 if (figure != null && figure.Data.isWhite == IsWhiteTurn)
                     selectedFigure = figure;
             }
+            Vector3 optimalHightForSelectedFigure = 2 * Vector3.up;
             if (selectedFigure != null)
-                selectedFigure.transform.position = hit.point + Vector3.up;
+                selectedFigure.transform.position = hit.point + optimalHightForSelectedFigure;
         }
         if (Input.GetMouseButtonUp(0))
             if (selectedFigure != null)
