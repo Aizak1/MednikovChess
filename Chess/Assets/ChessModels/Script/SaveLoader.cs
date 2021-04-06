@@ -22,6 +22,7 @@ public class SaveLoader:MonoBehaviour
         boardState.figuresData = board.FiguresOnBoard.Select(x => x.Data).ToArray();
         boardState.isWhiteTurn = board.IsWhiteTurn;
         boardState.currentTurnState = Board.CurrentTurnState;
+        boardState.previousMoveFinalPosition = board.PreviousMoveFinalPosition;
         string path = Path.Combine(Application.dataPath, "Save.json");
         using (StreamWriter streamWriter = new StreamWriter(path))
         {

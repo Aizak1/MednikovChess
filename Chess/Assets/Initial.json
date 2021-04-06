@@ -290,5 +290,9 @@
     }
   ],
   "isWhiteTurn": true,
-  "currentTurnState": 0
+  "currentTurnState": 0,
+  "previousMoveFinalPosition": {
+    "x": -1,
+    "y": -1
+  }
 }

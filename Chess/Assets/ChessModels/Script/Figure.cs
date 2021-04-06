@@ -10,7 +10,7 @@ public class Figure : MonoBehaviour
     private readonly static Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
     private readonly static Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
-    public bool IsAbleToMove(List<Figure> figuresOnBoard,Vector2Int finalPosition)
+    public bool IsAbleToMove(List<Figure> figuresOnBoard,Vector2Int previousMoveFinalPosition,Vector2Int finalPosition)
     {
         if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
             return false;
@@ -37,7 +37,8 @@ public class Figure : MonoBehaviour
                             figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == new Vector2Int(finalPosition.x, pawnPassageYLocation)
                             && Data.isWhite != figure.Data.isWhite && figure.Data.kind == Kind.Pawn && figure.Data.turnCount == 1);
                             if (figureToCapture != null)
-                                canMove = true;
+                                if(figureToCapture.Data.position == previousMoveFinalPosition)
+                                    canMove = true;
                         }
                     }
                     else

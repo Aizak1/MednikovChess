@@ -17,7 +17,7 @@ public struct FigureData
    public Vector2Int position;
    public  bool isWhite;
    public  Kind kind;
-    public int  turnCount;
+   public int  turnCount;
    public FigureData(Vector2Int position, bool isWhite, Kind kind,int turnCount)
    {
      this.position = position;
@@ -25,5 +25,4 @@ public struct FigureData
      this.kind = kind;
      this.turnCount = turnCount;
    }
-    
 }

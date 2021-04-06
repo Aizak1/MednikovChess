@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections;
+
 public enum GameState
 {
     NotStarted,
@@ -22,12 +24,13 @@ public class Board : MonoBehaviour
     [SerializeField] private ModelMathcer modelMatcher;
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
-   
     private List<Move> currentTurnMoves;
+    public  Vector2Int PreviousMoveFinalPosition { get; private set; }
     public bool IsWhiteTurn { get; private set; }
+    public List<Figure> FiguresOnBoard { get; private set; }
     public static GameState CurrentGameState { get; set; }
     public static TurnState CurrentTurnState { get; set; }
-    public List<Figure> FiguresOnBoard { get; private set; }
+   
     private void Start()
     {
         FiguresOnBoard = new List<Figure>();
@@ -39,6 +42,7 @@ public class Board : MonoBehaviour
             GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind, initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
         IsWhiteTurn = initialState.isWhiteTurn;
         CurrentTurnState = initialState.currentTurnState;
+        PreviousMoveFinalPosition = initialState.previousMoveFinalPosition;
     }
     private void Update()
     {
@@ -80,7 +84,7 @@ public class Board : MonoBehaviour
                 for (int x = 0; x < 8; x++)
                 {
                     Vector2Int finalPosition = new Vector2Int(x, z);
-                    if(figure.IsAbleToMove(figuresOnBoard,finalPosition))
+                    if(figure.IsAbleToMove(figuresOnBoard,PreviousMoveFinalPosition,finalPosition))
                     {
                         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
                         List<Figure> boardCopy = new List<Figure>(figuresOnBoard);
@@ -107,7 +111,7 @@ public class Board : MonoBehaviour
         bool canEatKing = false;
         foreach (var opponentFigure in opponentTurnFigures)
         {
-            if (opponentFigure.IsAbleToMove(boardCopy, currentKing.Data.position))
+            if (opponentFigure.IsAbleToMove(boardCopy, PreviousMoveFinalPosition,currentKing.Data.position))
                 canEatKing = true;
         }
         return canEatKing;
@@ -156,6 +160,7 @@ public class Board : MonoBehaviour
             Destroy(move.CurrentFigure.gameObject);
             GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(backUpData.kind, backUpData.isWhite)], backUpData);
         }
+        PreviousMoveFinalPosition = move.FinalPosition;
         if (IsCheck(FiguresOnBoard))
             CurrentTurnState = TurnState.Check;
         else
