@@ -30,6 +30,7 @@ public class Board : MonoBehaviour
     public List<Figure> FiguresOnBoard { get; private set; }
     private void Start()
     {
+        FiguresOnBoard = new List<Figure>();
         if (CurrentGameState == GameState.NotStarted)
             initialState = saveLoader.LoadState("Initial.json");
         else if (CurrentGameState == GameState.Continues)
@@ -38,7 +39,7 @@ public class Board : MonoBehaviour
             GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind, initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
         IsWhiteTurn = initialState.isWhiteTurn;
         CurrentTurnState = initialState.currentTurnState;
-        FiguresOnBoard = FindObjectsOfType<Figure>().ToList();
+        //FiguresOnBoard = FindObjectsOfType<Figure>().ToList();
     }
     private void Update()
     {
@@ -148,6 +149,14 @@ public class Board : MonoBehaviour
         move.CurrentFigure.Data.turnCount++;
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
+        if(move.CurrentFigure.Data.kind == Kind.Pawn && (move.FinalPosition.y == 7 || move.FinalPosition.y == 0))
+        {
+            FigureData backUpData = move.CurrentFigure.Data;
+            backUpData.kind = Kind.Queen;
+            FiguresOnBoard.Remove(move.CurrentFigure);
+            Destroy(move.CurrentFigure.gameObject);
+            GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(backUpData.kind, backUpData.isWhite)], backUpData);
+        }
         if (IsCheck(FiguresOnBoard))
             CurrentTurnState = TurnState.Check;
         else
@@ -175,5 +184,6 @@ public class Board : MonoBehaviour
     {
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
         figureGameObject.GetComponent<Figure>().Data = data;
+        FiguresOnBoard.Add(figureGameObject.GetComponent<Figure>());
     }
 }
