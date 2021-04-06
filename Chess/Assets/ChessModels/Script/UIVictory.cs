@@ -17,10 +17,15 @@ public class UIVictory : MonoBehaviour
         {
             saveLoadCanvas.enabled = false;
             victoryCanvas.enabled = true;
+            string kindOfend = "";
+            if (Board.CurrentTurnState == TurnState.CheckAndMate)
+                kindOfend = "(Mate)";
+            else if (Board.CurrentTurnState == TurnState.Pat)
+                kindOfend = "(Pat)";
             if (board.IsWhiteTurn)
-                winText.text = "Black Wins";
+                winText.text = $"Black Wins{kindOfend}";
             else
-                winText.text = "White Wins";
+                winText.text = $"White Wins{kindOfend}";
         }
     }
 }

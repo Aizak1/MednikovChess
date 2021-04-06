@@ -27,7 +27,6 @@ public class Board : MonoBehaviour
     public bool IsWhiteTurn { get; private set; }
     public static GameState CurrentGameState { get; set; }
     public static TurnState CurrentTurnState { get; set; }
-
     public List<Figure> FiguresOnBoard { get; private set; }
     private void Start()
     {
