@@ -8,6 +8,13 @@ public enum GameState
     Continues,
     Finished
 }
+public enum TurnState
+{
+    Obvious,
+    Check,
+    CheckAndMate,
+    Pat
+}
 public class Board : MonoBehaviour
 {
     [SerializeField] private SaveLoader saveLoader;
@@ -19,6 +26,7 @@ public class Board : MonoBehaviour
     private List<Move> currentTurnMoves;
     public bool IsWhiteTurn { get; private set; }
     public static GameState CurrentGameState { get; set; }
+    public static TurnState CurrentTurnState { get; set; } 
     private void Start()
     {
         if (CurrentGameState == GameState.NotStarted)
@@ -81,26 +89,35 @@ public class Board : MonoBehaviour
                         int indexOfFigure = boardCopy.IndexOf(figure);
                         FigureData figureDataBackUp = boardCopy[indexOfFigure].Data;
                         boardCopy[indexOfFigure].Data.position = finalPosition;
-                        var opponentTurnFigures = boardCopy.Where(figure =>  figure.Data.isWhite != IsWhiteTurn).ToArray();
-                        var currentKing = boardCopy.FirstOrDefault(figure => figure.Data.kind == Kind.King && figure.Data.isWhite == IsWhiteTurn);
-                        bool canEatKing = false;
-                        foreach (var opponentFigure in opponentTurnFigures)
-                        {
-                            if (opponentFigure.IsAbleToMove(boardCopy, currentKing.Data.position))
-                                canEatKing = true;
-                        }
-                        if (!canEatKing)
+                        if (!IsCheck(boardCopy))
                             possibleMoves.Add(new Move(figure, finalPosition));
                         boardCopy[indexOfFigure].Data = figureDataBackUp;
-                       
                     }
                 }
             }
         }
         return possibleMoves;
     }
+
+    private bool IsCheck(List<Figure> boardCopy)
+    {
+        var opponentTurnFigures = boardCopy.Where(figure => figure.Data.isWhite != IsWhiteTurn).ToArray();
+        var currentKing = boardCopy.FirstOrDefault(figure => figure.Data.kind == Kind.King && figure.Data.isWhite == IsWhiteTurn);
+        bool canEatKing = false;
+        foreach (var opponentFigure in opponentTurnFigures)
+        {
+            if (opponentFigure.IsAbleToMove(boardCopy, currentKing.Data.position))
+                canEatKing = true;
+        }
+        return canEatKing;
+    }
+
     private void TryMakeTurn(Move move)
     {
+        if (IsCheck(figuresOnBoard))
+            CurrentTurnState = TurnState.Check;
+        else
+            CurrentTurnState = TurnState.Obvious;
         Vector2Int initialPosition = move.CurrentFigure.Data.position;
         var possibleMove = currentTurnMoves.FirstOrDefault(validMove => validMove.CurrentFigure == move.CurrentFigure && validMove.FinalPosition == move.FinalPosition);
         if (possibleMove == null)
@@ -124,8 +141,18 @@ public class Board : MonoBehaviour
             move.CurrentFigure.Data.isFirstTurn = false;
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
+        if (IsCheck(figuresOnBoard))
+            CurrentTurnState = TurnState.Check;
+        else
+            CurrentTurnState = TurnState.Obvious;
         if (GetAllCurrentTurnMoves(figuresOnBoard).Count == 0)
+        {
+            if (CurrentTurnState == TurnState.Check)
+                CurrentTurnState = TurnState.CheckAndMate;
+            else
+                CurrentTurnState = TurnState.Pat;
             CurrentGameState = GameState.Finished;
+        }   
     }
 
     private void MakeCastling(Move move)

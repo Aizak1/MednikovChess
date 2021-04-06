@@ -10,13 +10,13 @@ public class Figure : MonoBehaviour
     private readonly static Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
     private readonly static Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
-    public bool IsAbleToMove(List<Figure> board,Vector2Int finalPosition)
+    public bool IsAbleToMove(List<Figure> figuresOnBoard,Vector2Int finalPosition)
     {
         if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
             return false;
         if (Data.position == finalPosition)
             return false;
-        var figureToCapture = board.FirstOrDefault(figure => figure.Data.position == finalPosition);
+        var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
         var delta = new Vector2Int(Mathf.Abs(finalPosition.x - Data.position.x), Mathf.Abs(finalPosition.y - Data.position.y));
         bool canMove = false;
         switch (Data.kind)
@@ -40,7 +40,7 @@ public class Figure : MonoBehaviour
                 }
                 break;
             case Kind.Rook:
-                canMove =  IsDirectionalFigureAbleToMove(board, figureToCapture, finalPosition, rookDirections);
+                canMove =  IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, finalPosition, rookDirections);
                 break;
             case Kind.Knight:
                 if ((delta.x == 1 && delta.y == 2) || (delta.x == 2 && delta.y == 1))
@@ -48,21 +48,21 @@ public class Figure : MonoBehaviour
                         canMove =  true;
                 break;
             case Kind.Bishop:
-                canMove =  IsDirectionalFigureAbleToMove(board, figureToCapture, finalPosition, bishopDirections);
+                canMove =  IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, finalPosition, bishopDirections);
                 break;
             case Kind.Queen:
-                canMove =  IsDirectionalFigureAbleToMove(board, figureToCapture, finalPosition, allDirections);
+                canMove =  IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, finalPosition, allDirections);
                 break;
             case Kind.King:
-                if (delta.x == 2 && Data.isFirstTurn)
+                if (delta.x == 2 && Data.isFirstTurn && Board.CurrentTurnState != TurnState.Check)
                 {
                     if (finalPosition.x == 2 || finalPosition.x == 6 && figureToCapture == null)
                     {
                         int suitableRookXPosition = finalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
-                        var suitableRook = board.FirstOrDefault(figure => figure.Data.kind == Kind.Rook 
+                        var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook 
                                                          && figure.Data.isWhite == Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, Data.position.y));
                         if(suitableRook!=null && suitableRook.Data.isFirstTurn)
-                            canMove = IsDirectionalFigureAbleToMove(board, figureToCapture, suitableRook.Data.position, rookDirections);
+                            canMove = IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, suitableRook.Data.position, rookDirections);
                     } 
                 }
                 else if (figureToCapture == null || figureToCapture.Data.isWhite != Data.isWhite)
@@ -71,9 +71,9 @@ public class Figure : MonoBehaviour
         }
         return canMove;
     }
-    private bool IsDirectionalFigureAbleToMove(List<Figure>board,Figure figureToCapture, Vector2Int finalPosition,Vector2Int[] allPossibleDirections)
+    private bool IsDirectionalFigureAbleToMove(List<Figure>figuresOnBoard,Figure figureToCapture, Vector2Int finalPosition,Vector2Int[] allPossibleDirections)
     {
-        Vector2Int[] figuresPositions = board.Select(figure => figure.Data.position).ToArray();
+        Vector2Int[] figuresPositions = figuresOnBoard.Select(figure => figure.Data.position).ToArray();
         if (figureToCapture != null && figureToCapture.Data.isWhite == Data.isWhite)
             return false;
         var initialPosition = Data.position;

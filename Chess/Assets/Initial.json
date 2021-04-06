@@ -289,5 +289,6 @@
       "isFirstTurn": true
     }
   ],
-  "isWhiteTurn": true
+  "isWhiteTurn": true,
+  "currentTurnState": 0
 }
