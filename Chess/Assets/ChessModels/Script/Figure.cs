@@ -10,8 +10,6 @@ public class Figure : MonoBehaviour
     private readonly static Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
     private readonly static Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
-    public static Vector2Int[] AllDirections => allDirections;
-  
     public bool IsAbleToMove(List<Figure> board,Vector2Int finalPosition)
     {
         if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
@@ -28,7 +26,7 @@ public class Figure : MonoBehaviour
                 {
                     if (figureToCapture == null)
                     {
-                        if (Data.isWhite && Data.position.y == 1 || !Data.isWhite && Data.position.y == 6 )
+                        if (Data.isFirstTurn)
                             if (delta.x == 0 && delta.y == 2)
                                 canMove = true;
                         if (delta.x == 0 && delta.y == 1)
@@ -56,8 +54,19 @@ public class Figure : MonoBehaviour
                 canMove =  IsDirectionalFigureAbleToMove(board, figureToCapture, finalPosition, allDirections);
                 break;
             case Kind.King:
-                if (figureToCapture == null || figureToCapture.Data.isWhite != Data.isWhite)
-                    canMove = allDirections.Contains(delta);
+                if (delta.x == 2 && Data.isFirstTurn)
+                {
+                    if (finalPosition.x == 2 || finalPosition.x == 6 && figureToCapture == null)
+                    {
+                        int suitableRookXPosition = finalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
+                        var suitableRook = board.FirstOrDefault(figure => figure.Data.kind == Kind.Rook 
+                                                         && figure.Data.isWhite == Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, Data.position.y));
+                        if(suitableRook!=null && suitableRook.Data.isFirstTurn)
+                            canMove = IsDirectionalFigureAbleToMove(board, figureToCapture, suitableRook.Data.position, rookDirections);
+                    } 
+                }
+                else if (figureToCapture == null || figureToCapture.Data.isWhite != Data.isWhite)
+                        canMove = allDirections.Contains(delta);
                 break;
         }
         return canMove;
@@ -87,5 +96,4 @@ public class Figure : MonoBehaviour
         }
         return false;
     }
-   
 }

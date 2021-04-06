@@ -7,7 +7,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -15,7 +16,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -23,7 +25,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -31,7 +34,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -39,7 +43,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -47,7 +52,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -55,7 +61,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -63,7 +70,8 @@
         "y": 1
       },
       "isWhite": true,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -71,7 +79,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 1
+      "kind": 1,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -79,7 +88,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 2
+      "kind": 2,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -87,7 +97,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 3
+      "kind": 3,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -95,7 +106,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 4
+      "kind": 4,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -103,7 +115,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 5
+      "kind": 5,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -111,7 +124,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 3
+      "kind": 3,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -119,7 +133,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 2
+      "kind": 2,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -127,7 +142,8 @@
         "y": 0
       },
       "isWhite": true,
-      "kind": 1
+      "kind": 1,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -143,7 +159,8 @@
         "y": 6
       },
       "isWhite": false,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -151,7 +168,8 @@
         "y": 6
       },
       "isWhite": false,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -159,7 +177,8 @@
         "y": 6
       },
       "isWhite": false,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -167,7 +186,8 @@
         "y": 6
       },
       "isWhite": false,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -175,7 +195,8 @@
         "y": 6
       },
       "isWhite": false,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -183,7 +204,8 @@
         "y": 6
       },
       "isWhite": false,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -191,7 +213,8 @@
         "y": 6
       },
       "isWhite": false,
-      "kind": 0
+      "kind": 0,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -199,7 +222,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 1
+      "kind": 1,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -207,7 +231,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 2
+      "kind": 2,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -215,7 +240,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 3
+      "kind": 3,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -223,7 +249,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 4
+      "kind": 4,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -231,7 +258,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 5
+      "kind": 5,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -239,7 +267,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 3
+      "kind": 3,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -247,7 +276,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 2
+      "kind": 2,
+      "isFirstTurn": true
     },
     {
       "position": {
@@ -255,7 +285,8 @@
         "y": 7
       },
       "isWhite": false,
-      "kind": 1
+      "kind": 1,
+      "isFirstTurn": true
     }
   ],
   "isWhiteTurn": true

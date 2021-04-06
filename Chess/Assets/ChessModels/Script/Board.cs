@@ -92,6 +92,7 @@ public class Board : MonoBehaviour
                         if (!canEatKing)
                             possibleMoves.Add(new Move(figure, finalPosition));
                         boardCopy[indexOfFigure].Data = figureDataBackUp;
+                       
                     }
                 }
             }
@@ -108,6 +109,9 @@ public class Board : MonoBehaviour
             selectedFigure = null;
             return;
         }
+        if (Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 2 && move.CurrentFigure.Data.kind == Kind.King)
+            MakeCastling(move);
+        
         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
         if (figureToCapture != null)
         {
@@ -116,12 +120,25 @@ public class Board : MonoBehaviour
         } 
         move.CurrentFigure.Data.position = move.FinalPosition;
         move.CurrentFigure.transform.position = new Vector3(move.FinalPosition.x, 0, move.FinalPosition.y);
+        if(move.CurrentFigure.Data.isFirstTurn)
+            move.CurrentFigure.Data.isFirstTurn = false;
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
         if (GetAllCurrentTurnMoves(figuresOnBoard).Count == 0)
             CurrentGameState = GameState.Finished;
-        
     }
+
+    private void MakeCastling(Move move)
+    {
+        int suitableRookXPosition = move.FinalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
+        var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
+                           && figure.Data.isWhite == IsWhiteTurn && figure.Data.position == new Vector2Int(suitableRookXPosition, move.CurrentFigure.Data.position.y));
+        int rookOffset = suitableRookXPosition == 0 ? -1 : 1;
+        suitableRook.Data.position = new Vector2Int(move.CurrentFigure.Data.position.x + rookOffset, move.CurrentFigure.Data.position.y);
+        suitableRook.Data.isFirstTurn = false;
+        suitableRook.transform.position = new Vector3(move.CurrentFigure.Data.position.x + rookOffset , 0, move.CurrentFigure.Data.position.y);
+    }
+
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
