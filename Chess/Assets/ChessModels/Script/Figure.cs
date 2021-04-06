@@ -26,11 +26,19 @@ public class Figure : MonoBehaviour
                 {
                     if (figureToCapture == null)
                     {
-                        if (Data.isFirstTurn)
+                        if (Data.turnCount == 0)
                             if (delta.x == 0 && delta.y == 2)
                                 canMove = true;
                         if (delta.x == 0 && delta.y == 1)
-                            canMove = true;
+                           canMove = true;
+                        if((finalPosition.y == 5 || finalPosition.y == 2) && delta == Vector2Int.one)
+                        {
+                            int pawnPassageYLocation = finalPosition.y == 5 ? pawnPassageYLocation = 4 : pawnPassageYLocation = 3;
+                            figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == new Vector2Int(finalPosition.x, pawnPassageYLocation)
+                            && Data.isWhite != figure.Data.isWhite && figure.Data.kind == Kind.Pawn && figure.Data.turnCount == 1);
+                            if (figureToCapture != null)
+                                canMove = true;
+                        }
                     }
                     else
                     {
@@ -54,14 +62,14 @@ public class Figure : MonoBehaviour
                 canMove =  IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, finalPosition, allDirections);
                 break;
             case Kind.King:
-                if (delta.x == 2 && Data.isFirstTurn && Board.CurrentTurnState != TurnState.Check)
+                if (delta.x == 2 && Data.turnCount == 0 && Board.CurrentTurnState != TurnState.Check)
                 {
                     if (finalPosition.x == 2 || finalPosition.x == 6 && figureToCapture == null)
                     {
                         int suitableRookXPosition = finalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
                         var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook 
                                                          && figure.Data.isWhite == Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, Data.position.y));
-                        if(suitableRook!=null && suitableRook.Data.isFirstTurn)
+                        if(suitableRook!=null && suitableRook.Data.turnCount == 0)
                             canMove = IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, suitableRook.Data.position, rookDirections);
                     } 
                 }

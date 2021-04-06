@@ -17,13 +17,13 @@ public struct FigureData
    public Vector2Int position;
    public  bool isWhite;
    public  Kind kind;
-    public bool isFirstTurn;
-   public FigureData(Vector2Int position, bool isWhite, Kind kind,bool isFirstTurn)
+    public int  turnCount;
+   public FigureData(Vector2Int position, bool isWhite, Kind kind,int turnCount)
    {
      this.position = position;
      this.isWhite = isWhite;
      this.kind = kind;
-     this.isFirstTurn = isFirstTurn;
+     this.turnCount = turnCount;
    }
     
 }

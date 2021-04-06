@@ -100,7 +100,6 @@ public class Board : MonoBehaviour
         }
         return possibleMoves;
     }
-
     private bool IsCheck(List<Figure> boardCopy)
     {
         var opponentTurnFigures = boardCopy.Where(figure => figure.Data.isWhite != IsWhiteTurn).ToArray();
@@ -113,7 +112,6 @@ public class Board : MonoBehaviour
         }
         return canEatKing;
     }
-
     private void TryMakeTurn(Move move)
     {
         if (IsCheck(FiguresOnBoard))
@@ -130,8 +128,16 @@ public class Board : MonoBehaviour
         }
         if (Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 2 && move.CurrentFigure.Data.kind == Kind.King)
             MakeCastling(move);
-        
         var figureToCapture = FiguresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
+        if(figureToCapture == null && move.CurrentFigure.Data.kind == Kind.Pawn)
+        {
+            if(Mathf.Abs(move.CurrentFigure.Data.position.y - move.FinalPosition.y) == 1 && Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 1)
+            {
+                int pawnPassageYLocation = move.FinalPosition.y == 5 ? pawnPassageYLocation = 4 : pawnPassageYLocation = 3;
+                figureToCapture = FiguresOnBoard.FirstOrDefault(figure => figure.Data.position == new Vector2Int(move.FinalPosition.x, pawnPassageYLocation)
+                && figure.Data.isWhite != IsWhiteTurn && figure.Data.kind == Kind.Pawn);
+            }
+        }
         if (figureToCapture != null)
         {
             FiguresOnBoard.Remove(figureToCapture);
@@ -139,8 +145,7 @@ public class Board : MonoBehaviour
         } 
         move.CurrentFigure.Data.position = move.FinalPosition;
         move.CurrentFigure.transform.position = new Vector3(move.FinalPosition.x, 0, move.FinalPosition.y);
-        if(move.CurrentFigure.Data.isFirstTurn)
-            move.CurrentFigure.Data.isFirstTurn = false;
+        move.CurrentFigure.Data.turnCount++;
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
         if (IsCheck(FiguresOnBoard))
@@ -156,7 +161,6 @@ public class Board : MonoBehaviour
             CurrentGameState = GameState.Finished;
         }   
     }
-
     private void MakeCastling(Move move)
     {
         int suitableRookXPosition = move.FinalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
@@ -164,10 +168,9 @@ public class Board : MonoBehaviour
                            && figure.Data.isWhite == IsWhiteTurn && figure.Data.position == new Vector2Int(suitableRookXPosition, move.CurrentFigure.Data.position.y));
         int rookOffset = suitableRookXPosition == 0 ? -1 : 1;
         suitableRook.Data.position = new Vector2Int(move.CurrentFigure.Data.position.x + rookOffset, move.CurrentFigure.Data.position.y);
-        suitableRook.Data.isFirstTurn = false;
+        suitableRook.Data.turnCount++;
         suitableRook.transform.position = new Vector3(move.CurrentFigure.Data.position.x + rookOffset , 0, move.CurrentFigure.Data.position.y);
     }
-
     private void GenetateFigure(GameObject figurePrefab, FigureData data)
     {
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
