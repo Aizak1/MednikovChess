@@ -19,7 +19,7 @@ public class SaveLoader:MonoBehaviour
     {
         BoardState boardState;
         Board board = FindObjectOfType<Board>();
-        boardState.figuresData = FindObjectsOfType<Figure>().Select(figure => figure.Data).ToArray();
+        boardState.figuresData = board.FiguresOnBoard.Select(x => x.Data).ToArray();
         boardState.isWhiteTurn = board.IsWhiteTurn;
         boardState.currentTurnState = Board.CurrentTurnState;
         string path = Path.Combine(Application.dataPath, "Save.json");

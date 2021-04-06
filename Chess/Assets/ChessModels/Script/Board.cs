@@ -22,11 +22,13 @@ public class Board : MonoBehaviour
     [SerializeField] private ModelMathcer modelMatcher;
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
-    private List<Figure> figuresOnBoard;
+   
     private List<Move> currentTurnMoves;
     public bool IsWhiteTurn { get; private set; }
     public static GameState CurrentGameState { get; set; }
-    public static TurnState CurrentTurnState { get; set; } 
+    public static TurnState CurrentTurnState { get; set; }
+
+    public List<Figure> FiguresOnBoard { get; private set; }
     private void Start()
     {
         if (CurrentGameState == GameState.NotStarted)
@@ -36,7 +38,8 @@ public class Board : MonoBehaviour
         for (int i = 0; i < initialState.figuresData.Length; i++)
             GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind, initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
         IsWhiteTurn = initialState.isWhiteTurn;
-        figuresOnBoard = FindObjectsOfType<Figure>().ToList();
+        CurrentTurnState = initialState.currentTurnState;
+        FiguresOnBoard = FindObjectsOfType<Figure>().ToList();
     }
     private void Update()
     {
@@ -53,7 +56,7 @@ public class Board : MonoBehaviour
             tileHighlighter.transform.position = new Vector3(mouseDownPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y + tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {
-                currentTurnMoves = GetAllCurrentTurnMoves(figuresOnBoard);
+                currentTurnMoves = GetAllCurrentTurnMoves(FiguresOnBoard);
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
                 bool figureIsAbleToMove = currentTurnMoves.Select(move => move.CurrentFigure).ToList().Contains(figure);
                 if (figure != null && figure.Data.isWhite == IsWhiteTurn && figureIsAbleToMove)
@@ -114,7 +117,7 @@ public class Board : MonoBehaviour
 
     private void TryMakeTurn(Move move)
     {
-        if (IsCheck(figuresOnBoard))
+        if (IsCheck(FiguresOnBoard))
             CurrentTurnState = TurnState.Check;
         else
             CurrentTurnState = TurnState.Obvious;
@@ -129,10 +132,10 @@ public class Board : MonoBehaviour
         if (Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 2 && move.CurrentFigure.Data.kind == Kind.King)
             MakeCastling(move);
         
-        var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
+        var figureToCapture = FiguresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
         if (figureToCapture != null)
         {
-            figuresOnBoard.Remove(figureToCapture);
+            FiguresOnBoard.Remove(figureToCapture);
             Destroy(figureToCapture.gameObject);
         } 
         move.CurrentFigure.Data.position = move.FinalPosition;
@@ -141,11 +144,11 @@ public class Board : MonoBehaviour
             move.CurrentFigure.Data.isFirstTurn = false;
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
-        if (IsCheck(figuresOnBoard))
+        if (IsCheck(FiguresOnBoard))
             CurrentTurnState = TurnState.Check;
         else
             CurrentTurnState = TurnState.Obvious;
-        if (GetAllCurrentTurnMoves(figuresOnBoard).Count == 0)
+        if (GetAllCurrentTurnMoves(FiguresOnBoard).Count == 0)
         {
             if (CurrentTurnState == TurnState.Check)
                 CurrentTurnState = TurnState.CheckAndMate;
@@ -158,7 +161,7 @@ public class Board : MonoBehaviour
     private void MakeCastling(Move move)
     {
         int suitableRookXPosition = move.FinalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
-        var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
+        var suitableRook = FiguresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
                            && figure.Data.isWhite == IsWhiteTurn && figure.Data.position == new Vector2Int(suitableRookXPosition, move.CurrentFigure.Data.position.y));
         int rookOffset = suitableRookXPosition == 0 ? -1 : 1;
         suitableRook.Data.position = new Vector2Int(move.CurrentFigure.Data.position.x + rookOffset, move.CurrentFigure.Data.position.y);
