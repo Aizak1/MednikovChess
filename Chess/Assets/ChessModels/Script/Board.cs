@@ -39,7 +39,6 @@ public class Board : MonoBehaviour
             GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind, initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
         IsWhiteTurn = initialState.isWhiteTurn;
         CurrentTurnState = initialState.currentTurnState;
-        //FiguresOnBoard = FindObjectsOfType<Figure>().ToList();
     }
     private void Update()
     {
