@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
@@ -24,14 +24,12 @@ public class Board : MonoBehaviour
     [SerializeField] private BoardState initialState;
     private Figure selectedFigure;
     private List<Move> currentTurnMoves;
-    public  Vector2Int PreviousMoveFinalPosition { get; private set; }
+    public Vector2Int PreviousMoveFinalPosition { get; private set; }
     public bool IsWhiteTurn { get; private set; }
     public List<Figure> FiguresOnBoard { get; private set; }
     public bool OnPause { get; private set; }
-    public TurnState CurrentTurnState { get; set; }
+    public static TurnState CurrentTurnState { get; set; }
     public static GameState CurrentGameState { get; set; }
-   
-   
     private void Start()
     {
         FiguresOnBoard = new List<Figure>();
@@ -67,12 +65,12 @@ public class Board : MonoBehaviour
                     selectedFigure = figure;
             }
             Vector3 optimalHightForSelectedFigure = 2 * Vector3.up;
-            if (selectedFigure != null) 
+            if (selectedFigure != null)
                 selectedFigure.transform.position = hit.point + optimalHightForSelectedFigure;
         }
         if (Input.GetMouseButtonUp(0))
             if (selectedFigure != null)
-                TryMakeTurn(new Move(selectedFigure,mouseDownPosition));
+                TryMakeTurn(new Move(selectedFigure, mouseDownPosition));
     }
     private List<Move> GetAllCurrentTurnMoves(List<Figure> figuresOnBoard)
     {
@@ -85,7 +83,7 @@ public class Board : MonoBehaviour
                 for (int x = 0; x < 8; x++)
                 {
                     Vector2Int finalPosition = new Vector2Int(x, z);
-                    if(figure.IsAbleToMove(figuresOnBoard,PreviousMoveFinalPosition,finalPosition,CurrentTurnState))
+                    if (figure.IsAbleToMove(figuresOnBoard, PreviousMoveFinalPosition, finalPosition))
                     {
                         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
                         List<Figure> boardCopy = new List<Figure>(figuresOnBoard);
@@ -112,7 +110,7 @@ public class Board : MonoBehaviour
         bool canEatKing = false;
         foreach (var opponentFigure in opponentTurnFigures)
         {
-            if (opponentFigure.IsAbleToMove(boardCopy, PreviousMoveFinalPosition,currentKing.Data.position,CurrentTurnState))
+            if (opponentFigure.IsAbleToMove(boardCopy, PreviousMoveFinalPosition, currentKing.Data.position))
                 canEatKing = true;
         }
         return canEatKing;
@@ -134,10 +132,10 @@ public class Board : MonoBehaviour
         if (Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 2 && move.CurrentFigure.Data.kind == Kind.King)
             MakeCastling(move);
         var figureToCapture = FiguresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
-        #region Проверка на взятие на проходе
+        #region РџСЂРѕРІРµСЂРєР° РЅР° РІР·СЏС‚РёРµ РЅР° РїСЂРѕС…РѕРґРµ
         if (figureToCapture == null && move.CurrentFigure.Data.kind == Kind.Pawn)
         {
-            if(Mathf.Abs(move.CurrentFigure.Data.position.y - move.FinalPosition.y) == 1 && Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 1)
+            if (Mathf.Abs(move.CurrentFigure.Data.position.y - move.FinalPosition.y) == 1 && Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 1)
             {
                 int pawnPassageYLocation = move.FinalPosition.y == 5 ? pawnPassageYLocation = 4 : pawnPassageYLocation = 3;
                 figureToCapture = FiguresOnBoard.FirstOrDefault(figure => figure.Data.position == new Vector2Int(move.FinalPosition.x, pawnPassageYLocation)
@@ -149,13 +147,13 @@ public class Board : MonoBehaviour
         {
             FiguresOnBoard.Remove(figureToCapture);
             Destroy(figureToCapture.gameObject);
-        } 
+        }
         move.CurrentFigure.Data.position = move.FinalPosition;
         move.CurrentFigure.transform.position = new Vector3(move.FinalPosition.x, 0, move.FinalPosition.y);
         move.CurrentFigure.Data.turnCount++;
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
-        if(move.CurrentFigure.Data.kind == Kind.Pawn && (move.FinalPosition.y == 7 || move.FinalPosition.y == 0))
+        if (move.CurrentFigure.Data.kind == Kind.Pawn && (move.FinalPosition.y == 7 || move.FinalPosition.y == 0))
             OnPause = true;
         PreviousMoveFinalPosition = move.FinalPosition;
         if (IsCheck(FiguresOnBoard))
@@ -169,7 +167,7 @@ public class Board : MonoBehaviour
             else
                 CurrentTurnState = TurnState.Pat;
             CurrentGameState = GameState.Finished;
-        }   
+        }
     }
     private void MakeCastling(Move move)
     {
@@ -179,7 +177,7 @@ public class Board : MonoBehaviour
         int rookOffset = suitableRookXPosition == 0 ? -1 : 1;
         suitableRook.Data.position = new Vector2Int(move.CurrentFigure.Data.position.x + rookOffset, move.CurrentFigure.Data.position.y);
         suitableRook.Data.turnCount++;
-        suitableRook.transform.position = new Vector3(move.CurrentFigure.Data.position.x + rookOffset , 0, move.CurrentFigure.Data.position.y);
+        suitableRook.transform.position = new Vector3(move.CurrentFigure.Data.position.x + rookOffset, 0, move.CurrentFigure.Data.position.y);
     }
     private void GenerateFigure(GameObject figurePrefab, FigureData data)
     {
@@ -187,7 +185,7 @@ public class Board : MonoBehaviour
         figureGameObject.GetComponent<Figure>().Data = data;
         FiguresOnBoard.Add(figureGameObject.GetComponent<Figure>());
     }
-    //Метод для кнопок на UI,который вызываются при достижении пешкой конца доски
+    //Method for UI that calls when pawn achieves the end of the board 
     public void TransformPawnToNewFigure(string enumName)
     {
         Figure pawnInTheEnd = FiguresOnBoard.Find(figure => figure.Data.position == PreviousMoveFinalPosition);

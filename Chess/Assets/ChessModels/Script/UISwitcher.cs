@@ -11,33 +11,34 @@ public class UISwitcher : MonoBehaviour
     [SerializeField] private Canvas selectionCanvas;
     [SerializeField] private TextMeshProUGUI winText;
     [SerializeField] private Board board;
-    
+
     void Update()
     {
-        if(Board.CurrentGameState == GameState.Finished)
+        if (Board.CurrentGameState == GameState.Finished)
         {
             saveLoadCanvas.enabled = false;
             victoryCanvas.enabled = true;
             string kindOfend = "";
-            if (board.CurrentTurnState == TurnState.CheckAndMate)
+            if (Board.CurrentTurnState == TurnState.CheckAndMate)
                 kindOfend = "(Mate)";
-            else if (board.CurrentTurnState == TurnState.Pat)
+            else if (Board.CurrentTurnState == TurnState.Pat)
                 kindOfend = "(Pat)";
             if (board.IsWhiteTurn)
                 winText.text = $"Black Wins{kindOfend}";
             else
                 winText.text = $"White Wins{kindOfend}";
         }
-        if(board.OnPause)
+        if (board.OnPause)
         {
             saveLoadCanvas.enabled = false;
             selectionCanvas.enabled = true;
         }
-        else
+        else if (Board.CurrentGameState != GameState.Finished)
         {
-            selectionCanvas.enabled = false;
             saveLoadCanvas.enabled = true;
+            selectionCanvas.enabled = false;
         }
+       
     }
    
 }
