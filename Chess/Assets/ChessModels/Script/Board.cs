@@ -28,8 +28,9 @@ public class Board : MonoBehaviour
     public bool IsWhiteTurn { get; private set; }
     public List<Figure> FiguresOnBoard { get; private set; }
     public bool OnPause { get; private set; }
+    public TurnState CurrentTurnState { get; set; }
     public static GameState CurrentGameState { get; set; }
-    public static TurnState CurrentTurnState { get; set; }
+   
    
     private void Start()
     {
@@ -84,7 +85,7 @@ public class Board : MonoBehaviour
                 for (int x = 0; x < 8; x++)
                 {
                     Vector2Int finalPosition = new Vector2Int(x, z);
-                    if(figure.IsAbleToMove(figuresOnBoard,PreviousMoveFinalPosition,finalPosition))
+                    if(figure.IsAbleToMove(figuresOnBoard,PreviousMoveFinalPosition,finalPosition,CurrentTurnState))
                     {
                         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
                         List<Figure> boardCopy = new List<Figure>(figuresOnBoard);
@@ -111,7 +112,7 @@ public class Board : MonoBehaviour
         bool canEatKing = false;
         foreach (var opponentFigure in opponentTurnFigures)
         {
-            if (opponentFigure.IsAbleToMove(boardCopy, PreviousMoveFinalPosition,currentKing.Data.position))
+            if (opponentFigure.IsAbleToMove(boardCopy, PreviousMoveFinalPosition,currentKing.Data.position,CurrentTurnState))
                 canEatKing = true;
         }
         return canEatKing;
@@ -133,7 +134,8 @@ public class Board : MonoBehaviour
         if (Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 2 && move.CurrentFigure.Data.kind == Kind.King)
             MakeCastling(move);
         var figureToCapture = FiguresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
-        if(figureToCapture == null && move.CurrentFigure.Data.kind == Kind.Pawn)
+        #region Проверка на взятие на проходе
+        if (figureToCapture == null && move.CurrentFigure.Data.kind == Kind.Pawn)
         {
             if(Mathf.Abs(move.CurrentFigure.Data.position.y - move.FinalPosition.y) == 1 && Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 1)
             {
@@ -142,6 +144,7 @@ public class Board : MonoBehaviour
                 && figure.Data.isWhite != IsWhiteTurn && figure.Data.kind == Kind.Pawn);
             }
         }
+        #endregion
         if (figureToCapture != null)
         {
             FiguresOnBoard.Remove(figureToCapture);

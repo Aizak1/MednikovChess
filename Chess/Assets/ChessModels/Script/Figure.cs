@@ -10,7 +10,7 @@ public class Figure : MonoBehaviour
     private readonly static Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
     private readonly static Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
-    public bool IsAbleToMove(List<Figure> figuresOnBoard,Vector2Int previousMoveFinalPosition,Vector2Int finalPosition)
+    public bool IsAbleToMove(List<Figure> figuresOnBoard,Vector2Int previousMoveFinalPosition,Vector2Int finalPosition,TurnState currentTurnState)
     {
         if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
             return false;
@@ -49,7 +49,7 @@ public class Figure : MonoBehaviour
                 }
                 break;
             case Kind.Rook:
-                canMove =  IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, finalPosition, rookDirections);
+                canMove =  CanMoveInConcrectDirections(figuresOnBoard, figureToCapture, finalPosition, rookDirections);
                 break;
             case Kind.Knight:
                 if ((delta.x == 1 && delta.y == 2) || (delta.x == 2 && delta.y == 1))
@@ -57,13 +57,13 @@ public class Figure : MonoBehaviour
                         canMove =  true;
                 break;
             case Kind.Bishop:
-                canMove =  IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, finalPosition, bishopDirections);
+                canMove =  CanMoveInConcrectDirections(figuresOnBoard, figureToCapture, finalPosition, bishopDirections);
                 break;
             case Kind.Queen:
-                canMove =  IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, finalPosition, allDirections);
+                canMove =  CanMoveInConcrectDirections(figuresOnBoard, figureToCapture, finalPosition, allDirections);
                 break;
             case Kind.King:
-                if (delta.x == 2 && Data.turnCount == 0 && Board.CurrentTurnState != TurnState.Check)
+                if (delta.x == 2 && Data.turnCount == 0 && currentTurnState != TurnState.Check)
                 {
                     if (finalPosition.x == 2 || finalPosition.x == 6 && figureToCapture == null)
                     {
@@ -71,7 +71,7 @@ public class Figure : MonoBehaviour
                         var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook 
                                                          && figure.Data.isWhite == Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, Data.position.y));
                         if(suitableRook!=null && suitableRook.Data.turnCount == 0)
-                            canMove = IsDirectionalFigureAbleToMove(figuresOnBoard, figureToCapture, suitableRook.Data.position, rookDirections);
+                            canMove = CanMoveInConcrectDirections(figuresOnBoard, figureToCapture, suitableRook.Data.position, rookDirections);
                     } 
                 }
                 else if (figureToCapture == null || figureToCapture.Data.isWhite != Data.isWhite)
@@ -80,7 +80,7 @@ public class Figure : MonoBehaviour
         }
         return canMove;
     }
-    private bool IsDirectionalFigureAbleToMove(List<Figure>figuresOnBoard,Figure figureToCapture, Vector2Int finalPosition,Vector2Int[] allPossibleDirections)
+    private bool CanMoveInConcrectDirections(List<Figure>figuresOnBoard,Figure figureToCapture, Vector2Int finalPosition,Vector2Int[] allPossibleDirections)
     {
         Vector2Int[] figuresPositions = figuresOnBoard.Select(figure => figure.Data.position).ToArray();
         if (figureToCapture != null && figureToCapture.Data.isWhite == Data.isWhite)

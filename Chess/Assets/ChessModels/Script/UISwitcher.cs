@@ -19,9 +19,9 @@ public class UISwitcher : MonoBehaviour
             saveLoadCanvas.enabled = false;
             victoryCanvas.enabled = true;
             string kindOfend = "";
-            if (Board.CurrentTurnState == TurnState.CheckAndMate)
+            if (board.CurrentTurnState == TurnState.CheckAndMate)
                 kindOfend = "(Mate)";
-            else if (Board.CurrentTurnState == TurnState.Pat)
+            else if (board.CurrentTurnState == TurnState.Pat)
                 kindOfend = "(Pat)";
             if (board.IsWhiteTurn)
                 winText.text = $"Black Wins{kindOfend}";
