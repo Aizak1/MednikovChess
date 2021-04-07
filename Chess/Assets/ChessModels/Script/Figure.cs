@@ -10,7 +10,7 @@ public class Figure : MonoBehaviour
     private readonly static Vector2Int[] bishopDirections = {new Vector2Int(1,1), new Vector2Int(1, -1),
         new Vector2Int(-1, -1), new Vector2Int(-1, 1)};
     private readonly static Vector2Int[] allDirections = rookDirections.Union(bishopDirections).ToArray();
-    public bool IsAbleToMove(List<Figure> figuresOnBoard, Vector2Int previousMoveFinalPosition, Vector2Int finalPosition)
+    public bool IsAbleToMove(List<Figure> figuresOnBoard, Vector2Int previousMoveFinalPosition, Vector2Int finalPosition,TurnState currentTurnState)
     {
         if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
             return false;
@@ -63,7 +63,7 @@ public class Figure : MonoBehaviour
                 canMove = CanMoveInConcrectDirections(figuresOnBoard, figureToCapture, finalPosition, allDirections);
                 break;
             case Kind.King:
-                if (delta.x == 2 && delta.y == 0 && Data.turnCount == 0 && Board.CurrentTurnState != TurnState.Check)
+                if (delta.x == 2 && delta.y == 0 && Data.turnCount == 0 && currentTurnState != TurnState.Check)
                 {
                     if (finalPosition.x == 2 || finalPosition.x == 6 && figureToCapture == null)
                     {

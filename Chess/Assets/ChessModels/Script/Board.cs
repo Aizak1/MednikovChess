@@ -28,7 +28,7 @@ public class Board : MonoBehaviour
     public bool IsWhiteTurn { get; private set; }
     public List<Figure> FiguresOnBoard { get; private set; }
     public bool OnPause { get; private set; }
-    public static TurnState CurrentTurnState { get; set; }
+    public  TurnState CurrentTurnState { get; private set; }
     public static GameState CurrentGameState { get; set; }
     private void Start()
     {
@@ -58,7 +58,7 @@ public class Board : MonoBehaviour
             tileHighlighter.transform.position = new Vector3(mouseDownPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y + tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
             {
-                currentTurnMoves = GetAllCurrentTurnMoves(FiguresOnBoard);
+                currentTurnMoves = GetAllCurrentTurnMoves(FiguresOnBoard, PreviousMoveFinalPosition, CurrentTurnState);
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
                 bool figureIsAbleToMove = currentTurnMoves.Select(move => move.CurrentFigure).ToList().Contains(figure);
                 if (figure != null && figure.Data.isWhite == IsWhiteTurn && figureIsAbleToMove)
@@ -72,7 +72,7 @@ public class Board : MonoBehaviour
             if (selectedFigure != null)
                 TryMakeTurn(new Move(selectedFigure, mouseDownPosition));
     }
-    private List<Move> GetAllCurrentTurnMoves(List<Figure> figuresOnBoard)
+    private List<Move> GetAllCurrentTurnMoves(List<Figure> figuresOnBoard,Vector2Int previousMoveFinalPosition,TurnState currentTurnState)
     {
         List<Move> possibleMoves = new List<Move>();
         var myFigures = figuresOnBoard.Where(figure => figure.Data.isWhite == IsWhiteTurn).ToArray();
@@ -83,7 +83,7 @@ public class Board : MonoBehaviour
                 for (int x = 0; x < 8; x++)
                 {
                     Vector2Int finalPosition = new Vector2Int(x, z);
-                    if (figure.IsAbleToMove(figuresOnBoard, PreviousMoveFinalPosition, finalPosition))
+                    if (figure.IsAbleToMove(figuresOnBoard, previousMoveFinalPosition, finalPosition,currentTurnState))
                     {
                         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
                         List<Figure> boardCopy = new List<Figure>(figuresOnBoard);
@@ -94,7 +94,7 @@ public class Board : MonoBehaviour
                         int indexOfFigure = boardCopy.IndexOf(figure);
                         FigureData figureDataBackUp = boardCopy[indexOfFigure].Data;
                         boardCopy[indexOfFigure].Data.position = finalPosition;
-                        if (!IsCheck(boardCopy))
+                        if (!IsCheck(boardCopy,previousMoveFinalPosition,currentTurnState))
                             possibleMoves.Add(new Move(figure, finalPosition));
                         boardCopy[indexOfFigure].Data = figureDataBackUp;
                     }
@@ -103,21 +103,21 @@ public class Board : MonoBehaviour
         }
         return possibleMoves;
     }
-    private bool IsCheck(List<Figure> boardCopy)
+    private bool IsCheck(List<Figure> boardCopy, Vector2Int previousMoveFinalPosition, TurnState currentTurnState)
     {
         var opponentTurnFigures = boardCopy.Where(figure => figure.Data.isWhite != IsWhiteTurn).ToArray();
         var currentKing = boardCopy.FirstOrDefault(figure => figure.Data.kind == Kind.King && figure.Data.isWhite == IsWhiteTurn);
         bool canEatKing = false;
         foreach (var opponentFigure in opponentTurnFigures)
         {
-            if (opponentFigure.IsAbleToMove(boardCopy, PreviousMoveFinalPosition, currentKing.Data.position))
+            if (opponentFigure.IsAbleToMove(boardCopy, previousMoveFinalPosition, currentKing.Data.position,currentTurnState))
                 canEatKing = true;
         }
         return canEatKing;
     }
     private void TryMakeTurn(Move move)
     {
-        if (IsCheck(FiguresOnBoard))
+        if (IsCheck(FiguresOnBoard,PreviousMoveFinalPosition,CurrentTurnState))
             CurrentTurnState = TurnState.Check;
         else
             CurrentTurnState = TurnState.Obvious;
@@ -156,11 +156,11 @@ public class Board : MonoBehaviour
         if (move.CurrentFigure.Data.kind == Kind.Pawn && (move.FinalPosition.y == 7 || move.FinalPosition.y == 0))
             OnPause = true;
         PreviousMoveFinalPosition = move.FinalPosition;
-        if (IsCheck(FiguresOnBoard))
+        if (IsCheck(FiguresOnBoard, PreviousMoveFinalPosition, CurrentTurnState))
             CurrentTurnState = TurnState.Check;
         else
             CurrentTurnState = TurnState.Obvious;
-        if (GetAllCurrentTurnMoves(FiguresOnBoard).Count == 0)
+        if (GetAllCurrentTurnMoves(FiguresOnBoard, PreviousMoveFinalPosition, CurrentTurnState).Count == 0)
         {
             if (CurrentTurnState == TurnState.Check)
                 CurrentTurnState = TurnState.CheckAndMate;
