@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
-
 public enum GameState
 {
     NotStarted,
@@ -28,6 +27,7 @@ public class Board : MonoBehaviour
     public  Vector2Int PreviousMoveFinalPosition { get; private set; }
     public bool IsWhiteTurn { get; private set; }
     public List<Figure> FiguresOnBoard { get; private set; }
+    public bool OnPause { get; private set; }
     public static GameState CurrentGameState { get; set; }
     public static TurnState CurrentTurnState { get; set; }
    
@@ -39,14 +39,14 @@ public class Board : MonoBehaviour
         else if (CurrentGameState == GameState.Continues)
             initialState = saveLoader.LoadState("Save.json");
         for (int i = 0; i < initialState.figuresData.Length; i++)
-            GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind, initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
+            GenerateFigure(modelMatcher.KindModelPairs[Tuple.Create(initialState.figuresData[i].kind, initialState.figuresData[i].isWhite)], initialState.figuresData[i]);
         IsWhiteTurn = initialState.isWhiteTurn;
         CurrentTurnState = initialState.currentTurnState;
         PreviousMoveFinalPosition = initialState.previousMoveFinalPosition;
     }
     private void Update()
     {
-        if (CurrentGameState == GameState.Finished)
+        if (CurrentGameState == GameState.Finished || OnPause)
             return;
         Vector2Int mouseDownPosition = Vector2Int.zero - Vector2Int.one;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -153,13 +153,7 @@ public class Board : MonoBehaviour
         selectedFigure = null;
         IsWhiteTurn = !IsWhiteTurn;
         if(move.CurrentFigure.Data.kind == Kind.Pawn && (move.FinalPosition.y == 7 || move.FinalPosition.y == 0))
-        {
-            FigureData backUpData = move.CurrentFigure.Data;
-            backUpData.kind = Kind.Queen;
-            FiguresOnBoard.Remove(move.CurrentFigure);
-            Destroy(move.CurrentFigure.gameObject);
-            GenetateFigure(modelMatcher.KindModelPairs[Tuple.Create(backUpData.kind, backUpData.isWhite)], backUpData);
-        }
+            OnPause = true;
         PreviousMoveFinalPosition = move.FinalPosition;
         if (IsCheck(FiguresOnBoard))
             CurrentTurnState = TurnState.Check;
@@ -184,10 +178,22 @@ public class Board : MonoBehaviour
         suitableRook.Data.turnCount++;
         suitableRook.transform.position = new Vector3(move.CurrentFigure.Data.position.x + rookOffset , 0, move.CurrentFigure.Data.position.y);
     }
-    private void GenetateFigure(GameObject figurePrefab, FigureData data)
+    private void GenerateFigure(GameObject figurePrefab, FigureData data)
     {
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
         figureGameObject.GetComponent<Figure>().Data = data;
         FiguresOnBoard.Add(figureGameObject.GetComponent<Figure>());
+    }
+    //Метод для кнопок на UI,который вызываются при достижении пешкой конца доски
+    public void TransformPawnToNewFigure(string enumName)
+    {
+        Figure pawnInTheEnd = FiguresOnBoard.Find(figure => figure.Data.position == PreviousMoveFinalPosition);
+        FigureData backUpData = pawnInTheEnd.Data;
+        Enum.TryParse(enumName, out Kind figureKind);
+        backUpData.kind = figureKind;
+        FiguresOnBoard.Remove(pawnInTheEnd);
+        Destroy(pawnInTheEnd.gameObject);
+        GenerateFigure(modelMatcher.KindModelPairs[Tuple.Create(backUpData.kind, backUpData.isWhite)], backUpData);
+        OnPause = false;
     }
 }

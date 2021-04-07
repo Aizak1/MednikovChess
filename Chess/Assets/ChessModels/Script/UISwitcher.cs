@@ -4,10 +4,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIVictory : MonoBehaviour
+public class UISwitcher : MonoBehaviour
 {
     [SerializeField] private Canvas victoryCanvas;
     [SerializeField] private Canvas saveLoadCanvas;
+    [SerializeField] private Canvas selectionCanvas;
     [SerializeField] private TextMeshProUGUI winText;
     [SerializeField] private Board board;
     
@@ -27,5 +28,16 @@ public class UIVictory : MonoBehaviour
             else
                 winText.text = $"White Wins{kindOfend}";
         }
+        if(board.OnPause)
+        {
+            saveLoadCanvas.enabled = false;
+            selectionCanvas.enabled = true;
+        }
+        else
+        {
+            selectionCanvas.enabled = false;
+            saveLoadCanvas.enabled = true;
+        }
     }
+   
 }

@@ -9,7 +9,7 @@ public enum Kind
     Knight,
     Bishop,
     Queen,
-    King,
+    King
 }
 [System.Serializable]
 public struct FigureData
