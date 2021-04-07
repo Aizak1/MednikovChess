@@ -83,7 +83,7 @@ public class Board : MonoBehaviour
                 for (int x = 0; x < 8; x++)
                 {
                     Vector2Int finalPosition = new Vector2Int(x, z);
-                    if (figure.IsAbleToMove(figuresOnBoard, previousMoveFinalPosition, finalPosition,currentTurnState))
+                    if (IsAbleToMove(figure,figuresOnBoard, previousMoveFinalPosition, finalPosition,currentTurnState))
                     {
                         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
                         List<Figure> boardCopy = new List<Figure>(figuresOnBoard);
@@ -110,7 +110,7 @@ public class Board : MonoBehaviour
         bool canEatKing = false;
         foreach (var opponentFigure in opponentTurnFigures)
         {
-            if (opponentFigure.IsAbleToMove(boardCopy, previousMoveFinalPosition, currentKing.Data.position,currentTurnState))
+            if (IsAbleToMove(opponentFigure,boardCopy, previousMoveFinalPosition, currentKing.Data.position,currentTurnState))
                 canEatKing = true;
         }
         return canEatKing;
@@ -184,6 +184,101 @@ public class Board : MonoBehaviour
         var figureGameObject = Instantiate(figurePrefab, new Vector3(data.position.x, 0, data.position.y), Quaternion.identity);
         figureGameObject.GetComponent<Figure>().Data = data;
         FiguresOnBoard.Add(figureGameObject.GetComponent<Figure>());
+    }
+    public bool IsAbleToMove(Figure figureToMove,List<Figure> figuresOnBoard, Vector2Int previousMoveFinalPosition, Vector2Int finalPosition, TurnState currentTurnState)
+    {
+        if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
+            return false;
+        if (figureToMove.Data.position == finalPosition)
+            return false;
+        var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
+        var delta = new Vector2Int(Mathf.Abs(finalPosition.x - figureToMove.Data.position.x), Mathf.Abs(finalPosition.y - figureToMove.Data.position.y));
+        bool canMove = false;
+        switch (figureToMove.Data.kind)
+        {
+            case Kind.Pawn:
+                if (figureToMove.Data.isWhite && finalPosition.y > figureToMove.Data.position.y || !figureToMove.Data.isWhite && finalPosition.y < figureToMove.Data.position.y)
+                {
+                    if (figureToCapture == null)
+                    {
+                        if (figureToMove.Data.turnCount == 0)
+                            if (delta.x == 0 && delta.y == 2)
+                                canMove = true;
+                        if (delta.x == 0 && delta.y == 1)
+                            canMove = true;
+                        if ((finalPosition.y == 5 || finalPosition.y == 2) && delta == Vector2Int.one)
+                        {
+                            int pawnPassageYLocation = finalPosition.y == 5 ? pawnPassageYLocation = 4 : pawnPassageYLocation = 3;
+                            figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == new Vector2Int(finalPosition.x, pawnPassageYLocation)
+                            && figureToMove.Data.isWhite != figure.Data.isWhite && figure.Data.kind == Kind.Pawn && figure.Data.turnCount == 1);
+                            if (figureToCapture != null)
+                                if (figureToCapture.Data.position == previousMoveFinalPosition)
+                                    canMove = true;
+                        }
+                    }
+                    else
+                    {
+                        if (delta == Vector2Int.one && figureToCapture.Data.isWhite != figureToMove.Data.isWhite)
+                            canMove = true;
+                    }
+                }
+                break;
+            case Kind.Rook:
+                canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, finalPosition, Figure.RookDirections);
+                break;
+            case Kind.Knight:
+                if ((delta.x == 1 && delta.y == 2) || (delta.x == 2 && delta.y == 1))
+                    if (figureToCapture == null || figureToCapture.Data.isWhite != figureToMove.Data.isWhite)
+                        canMove = true;
+                break;
+            case Kind.Bishop:
+                canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, finalPosition, Figure.BishopDirections);
+                break;
+            case Kind.Queen:
+                canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, finalPosition, Figure.AllDirections);
+                break;
+            case Kind.King:
+                if (delta.x == 2 && delta.y == 0 && figureToMove.Data.turnCount == 0 && currentTurnState != TurnState.Check)
+                {
+                    if (finalPosition.x == 2 || finalPosition.x == 6 && figureToCapture == null)
+                    {
+                        int suitableRookXPosition = finalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
+                        var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
+                                                         && figure.Data.isWhite == figureToMove.Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, figureToMove.Data.position.y));
+                        if (suitableRook != null && suitableRook.Data.turnCount == 0)
+                            canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, suitableRook.Data.position, Figure.RookDirections);
+                    }
+                }
+                else if (figureToCapture == null || figureToCapture.Data.isWhite != figureToMove.Data.isWhite)
+                    canMove = Figure.AllDirections.Contains(delta);
+                break;
+        }
+        return canMove;
+    }
+    private bool CanMoveInConcrectDirections(Figure figureToMove,List<Figure> figuresOnBoard, Figure figureToCapture, Vector2Int finalPosition, Vector2Int[] allPossibleDirections)
+    {
+        Vector2Int[] figuresPositions = figuresOnBoard.Select(figure => figure.Data.position).ToArray();
+        if (figureToCapture != null && figureToCapture.Data.isWhite == figureToMove.Data.isWhite)
+            return false;
+        var initialPosition = figureToMove.Data.position;
+        var direction = ((Vector2)finalPosition - initialPosition).normalized;
+        if (direction.x != 0 && direction.y != 0 && Mathf.Abs(direction.x) != Mathf.Abs(direction.y))
+            return false;
+        int directionalStepX = direction.x == 0 ? 0 : (int)(direction.x / Mathf.Abs(direction.x));
+        int directionalStepY = direction.y == 0 ? 0 : (int)(direction.y / Mathf.Abs(direction.y));
+        var directionalStep = new Vector2Int(directionalStepX, directionalStepY);
+        if (allPossibleDirections.Contains(directionalStep))
+        {
+            initialPosition += directionalStep;
+            while (initialPosition != finalPosition)
+            {
+                if (figuresPositions.Contains(initialPosition))
+                    return false;
+                initialPosition += directionalStep;
+            }
+            return true;
+        }
+        return false;
     }
     //Method for UI that calls when pawn achieves the end of the board 
     public void TransformPawnToNewFigure(string enumName)
