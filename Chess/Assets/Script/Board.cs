@@ -21,7 +21,8 @@ public class Board : MonoBehaviour
     [SerializeField] private SaveLoader saveLoader;
     [SerializeField] private GameObject tileHighlighter;
     [SerializeField] private ModelMathcer modelMatcher;
-    [SerializeField] private BoardState initialState;
+    [SerializeField] private SFX sfx;
+    private BoardState initialState;
     private Figure selectedFigure;
     private List<Move> currentTurnMoves;
     public Vector2Int PreviousMoveFinalPosition { get; private set; }
@@ -62,7 +63,10 @@ public class Board : MonoBehaviour
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
                 bool figureIsAbleToMove = currentTurnMoves.Select(move => move.CurrentFigure).ToList().Contains(figure);
                 if (figure != null && figure.Data.isWhite == IsWhiteTurn && figureIsAbleToMove)
+                {
                     selectedFigure = figure;
+                    sfx.PlayPicKSound();
+                }
             }
             Vector3 optimalHightForSelectedFigure = 2 * Vector3.up;
             if (selectedFigure != null)
@@ -126,6 +130,7 @@ public class Board : MonoBehaviour
         {
             move.CurrentFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
             selectedFigure = null;
+            sfx.PlayDropSound();
             return;
         }
         if (Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 2 && move.CurrentFigure.Data.kind == Kind.King)
@@ -146,6 +151,11 @@ public class Board : MonoBehaviour
         {
             FiguresOnBoard.Remove(figureToCapture);
             Destroy(figureToCapture.gameObject);
+            sfx.PlayKillSound();
+        }
+        else
+        {
+            sfx.PlayDropSound();
         }
         move.CurrentFigure.Data.position = move.FinalPosition;
         move.CurrentFigure.transform.position = new Vector3(move.FinalPosition.x, 0, move.FinalPosition.y);
