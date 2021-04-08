@@ -52,7 +52,7 @@ public class Board : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, LayerMask.GetMask("Board")))
         {
-            Vector2 cellOffset = new Vector2(0.565f, 0.45f);
+            Vector2 cellOffset = new Vector2(0.565f, 0.47f);
             mouseDownPosition = new Vector2Int((int)(hit.point.x + cellOffset.x), (int)(hit.point.z + cellOffset.y));
             tileHighlighter.SetActive(true);
             Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
