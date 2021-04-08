@@ -22,6 +22,7 @@ public class Board : MonoBehaviour
     [SerializeField] private GameObject tileHighlighter;
     [SerializeField] private ModelMathcer modelMatcher;
     [SerializeField] private SFX sfx;
+    [SerializeField] private GameObject vfx;
     private BoardState initialState;
     private Figure selectedFigure;
     private List<Move> currentTurnMoves;
@@ -150,6 +151,7 @@ public class Board : MonoBehaviour
         if (figureToCapture != null)
         {
             FiguresOnBoard.Remove(figureToCapture);
+            Instantiate(vfx, figureToCapture.transform.position, Quaternion.identity);
             Destroy(figureToCapture.gameObject);
             sfx.PlayKillSound();
         }
