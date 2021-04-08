@@ -9,7 +9,7 @@ public class UISwitcher : MonoBehaviour
     [SerializeField] private Canvas victoryCanvas;
     [SerializeField] private Canvas saveLoadCanvas;
     [SerializeField] private Canvas selectionCanvas;
-    [SerializeField] private TextMeshProUGUI winText;
+    [SerializeField] private TextMeshProUGUI endText;
     [SerializeField] private Board board;
 
     void Update()
@@ -18,15 +18,14 @@ public class UISwitcher : MonoBehaviour
         {
             saveLoadCanvas.enabled = false;
             victoryCanvas.enabled = true;
-            string kindOfend = "";
             if (board.CurrentTurnState == TurnState.CheckAndMate)
-                kindOfend = "(Mate)";
+                if (board.IsWhiteTurn)
+                    endText.text = $"Black Wins";
+                else
+                    endText.text = $"White Wins";
             else if (board.CurrentTurnState == TurnState.Pat)
-                kindOfend = "(Pat)";
-            if (board.IsWhiteTurn)
-                winText.text = $"Black Wins{kindOfend}";
-            else
-                winText.text = $"White Wins{kindOfend}";
+                endText.text = "Draw Match";
+            
         }
         if (board.OnPause)
         {

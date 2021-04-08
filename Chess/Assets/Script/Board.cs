@@ -120,7 +120,7 @@ public class Board : MonoBehaviour
     }
     private void TryMakeTurn(Move move)
     {
-        if (IsCheck(FiguresOnBoard,PreviousMoveFinalPosition,CurrentTurnState))
+        if (IsCheck(FiguresOnBoard, PreviousMoveFinalPosition, CurrentTurnState))
             CurrentTurnState = TurnState.Check;
         else
             CurrentTurnState = TurnState.Obvious;
@@ -169,6 +169,11 @@ public class Board : MonoBehaviour
             CurrentTurnState = TurnState.Check;
         else
             CurrentTurnState = TurnState.Obvious;
+        if (FiguresOnBoard.Count == 2 || (FiguresOnBoard.Count == 3 && FiguresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Queen || figure.Data.kind == Kind.Rook)==null))
+        {
+            CurrentTurnState = TurnState.Pat;
+            CurrentGameState = GameState.Finished;
+        }
         if (GetAllCurrentTurnMoves(FiguresOnBoard, PreviousMoveFinalPosition, CurrentTurnState).Count == 0)
         {
             if (CurrentTurnState == TurnState.Check)
