@@ -107,13 +107,12 @@ public class Board : MonoBehaviour
     {
         var opponentTurnFigures = boardCopy.Where(figure => figure.Data.isWhite != IsWhiteTurn).ToArray();
         var currentKing = boardCopy.FirstOrDefault(figure => figure.Data.kind == Kind.King && figure.Data.isWhite == IsWhiteTurn);
-        bool canEatKing = false;
         foreach (var opponentFigure in opponentTurnFigures)
         {
             if (IsAbleToMove(opponentFigure,boardCopy, previousMoveFinalPosition, currentKing.Data.position,currentTurnState))
-                canEatKing = true;
+                return true;
         }
-        return canEatKing;
+        return false;
     }
     private void TryMakeTurn(Move move)
     {
