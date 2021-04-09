@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 23228278863948662}
   m_Layer: 0
   m_Name: Selection-Blue
-  m_TagString: Untagged
+  m_TagString: MoveTile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

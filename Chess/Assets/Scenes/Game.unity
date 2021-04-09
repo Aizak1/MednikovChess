@@ -810,7 +810,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.449
+  m_Volume: 0.299
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -969,6 +969,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   saveLoader: {fileID: 1349827205}
   tileHighlighter: {fileID: 427831541}
+  moveHighlighter: {fileID: 1555274435638532, guid: 4cb3dfa64c6fa4774b49468d68a0845b, type: 3}
   modelMatcher: {fileID: 1410640660}
   sfx: {fileID: 386888268}
   vfx: {fileID: 366306233314132657, guid: 8e56178cc11ddbf4288fa434c23c04f2, type: 3}
@@ -3791,6 +3792,7 @@ GameObject:
   - component: {fileID: 4819890240312163069}
   - component: {fileID: 7223285281840992596}
   - component: {fileID: 7088132573065021521}
+  - component: {fileID: 7088132573065021522}
   m_Layer: 6
   m_Name: ChessBoard
   m_TagString: Untagged
@@ -3812,6 +3814,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1284130878809804175, guid: 5d3ec0591e90b7a46aced6ac66e80053, type: 3}
+--- !u!65 &7088132573065021522
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7088132573065021520}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 0.07959948, y: 0.080000006, z: 0.0024999997}
+  m_Center: {x: -0.030200256, y: 0.029999988, z: 1.4683411e-15}
 --- !u!23 &7223285281840992596
 MeshRenderer:
   m_ObjectHideFlags: 0

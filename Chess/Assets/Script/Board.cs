@@ -20,9 +20,11 @@ public class Board : MonoBehaviour
 {
     [SerializeField] private SaveLoader saveLoader;
     [SerializeField] private GameObject tileHighlighter;
+    [SerializeField] private GameObject moveHighlighter;
     [SerializeField] private ModelMathcer modelMatcher;
     [SerializeField] private SFX sfx;
     [SerializeField] private GameObject vfx;
+    private Vector3 boardInitialCoordinates = new Vector3(0.05999994f, 0, 7.008001f);
     private BoardState initialState;
     private Figure selectedFigure;
     private List<Move> currentTurnMoves;
@@ -34,6 +36,7 @@ public class Board : MonoBehaviour
     public static GameState CurrentGameState { get; set; }
     private void Start()
     {
+        transform.position = boardInitialCoordinates;
         FiguresOnBoard = new List<Figure>();
         if (CurrentGameState == GameState.NotStarted)
             initialState = saveLoader.LoadState("Initial.json");
@@ -66,10 +69,16 @@ public class Board : MonoBehaviour
                 if (figure != null && figure.Data.isWhite == IsWhiteTurn && figureIsAbleToMove)
                 {
                     selectedFigure = figure;
+                    var currentFigureMoves = currentTurnMoves.Where(move => move.CurrentFigure == selectedFigure).ToList();
+                    foreach (var move in currentFigureMoves)
+                    {
+                        Vector3 moveHighlighterPosition = new Vector3(move.FinalPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, move.FinalPosition.y + tileHighlighterOffset.z);
+                        Instantiate(moveHighlighter,moveHighlighterPosition, Quaternion.identity);
+                    }
                     sfx.PlayPicKSound();
                 }
             }
-            Vector3 optimalHightForSelectedFigure = 2 * Vector3.up;
+            Vector3 optimalHightForSelectedFigure = 2.2f * Vector3.up;
             if (selectedFigure != null)
                 selectedFigure.transform.position = hit.point + optimalHightForSelectedFigure;
         }
@@ -121,6 +130,11 @@ public class Board : MonoBehaviour
     }
     private void TryMakeTurn(Move move)
     {
+        var moveTiles = GameObject.FindGameObjectsWithTag("MoveTile");
+        foreach (var moveTile in moveTiles)
+        {
+            Destroy(moveTile.gameObject);
+        }
         if (IsCheck(FiguresOnBoard, PreviousMoveFinalPosition, CurrentTurnState))
             CurrentTurnState = TurnState.Check;
         else
