@@ -32,7 +32,7 @@ public class Board : MonoBehaviour
     public bool IsWhiteTurn { get; private set; }
     public List<Figure> FiguresOnBoard { get; private set; }
     public bool OnPause { get; private set; }
-    public  TurnState CurrentTurnState { get; private set; }
+    public TurnState CurrentTurnState { get; private set; }
     public static GameState CurrentGameState { get; set; }
     private void Start()
     {
@@ -59,6 +59,8 @@ public class Board : MonoBehaviour
             Vector2 cellOffset = new Vector2(0.565f, 0.47f);
             mouseDownPosition = new Vector2Int((int)(hit.point.x + cellOffset.x), (int)(hit.point.z + cellOffset.y));
             tileHighlighter.SetActive(true);
+            if(IsOutOfBounds(mouseDownPosition))
+                tileHighlighter.SetActive(false);
             Vector3 tileHighlighterOffset = new Vector3(0.04f, 0.126f, -0.03f);
             tileHighlighter.transform.position = new Vector3(mouseDownPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, mouseDownPosition.y + tileHighlighterOffset.z);
             if (Input.GetMouseButtonDown(0))
@@ -73,7 +75,7 @@ public class Board : MonoBehaviour
                     foreach (var move in currentFigureMoves)
                     {
                         Vector3 moveHighlighterPosition = new Vector3(move.FinalPosition.x + tileHighlighterOffset.x, tileHighlighterOffset.y, move.FinalPosition.y + tileHighlighterOffset.z);
-                        Instantiate(moveHighlighter,moveHighlighterPosition, Quaternion.identity);
+                        Instantiate(moveHighlighter, moveHighlighterPosition, Quaternion.identity);
                     }
                     sfx.PlayPicKSound();
                 }
@@ -81,14 +83,14 @@ public class Board : MonoBehaviour
             Vector3 optimalHightForSelectedFigure = 2.3f * Vector3.up;
             if (selectedFigure != null)
                 selectedFigure.transform.position = hit.point + optimalHightForSelectedFigure;
-            
-                
+
+
         }
         if (Input.GetMouseButtonUp(0))
             if (selectedFigure != null)
                 TryMakeTurn(new Move(selectedFigure, mouseDownPosition));
     }
-    private List<Move> GetAllCurrentTurnMoves(List<Figure> figuresOnBoard,Vector2Int previousMoveFinalPosition,TurnState currentTurnState)
+    private List<Move> GetAllCurrentTurnMoves(List<Figure> figuresOnBoard, Vector2Int previousMoveFinalPosition, TurnState currentTurnState)
     {
         List<Move> possibleMoves = new List<Move>();
         var myFigures = figuresOnBoard.Where(figure => figure.Data.isWhite == IsWhiteTurn).ToArray();
@@ -99,7 +101,7 @@ public class Board : MonoBehaviour
                 for (int x = 0; x < 8; x++)
                 {
                     Vector2Int finalPosition = new Vector2Int(x, z);
-                    if (IsAbleToMove(figure,figuresOnBoard, previousMoveFinalPosition, finalPosition,currentTurnState))
+                    if (IsAbleToMove(figure, figuresOnBoard, previousMoveFinalPosition, finalPosition, currentTurnState))
                     {
                         var figureToCapture = figuresOnBoard.FirstOrDefault(figure => figure.Data.position == finalPosition);
                         List<Figure> boardCopy = new List<Figure>(figuresOnBoard);
@@ -110,7 +112,7 @@ public class Board : MonoBehaviour
                         int indexOfFigure = boardCopy.IndexOf(figure);
                         FigureData figureDataBackUp = boardCopy[indexOfFigure].Data;
                         boardCopy[indexOfFigure].Data.position = finalPosition;
-                        if (!IsCheck(boardCopy,previousMoveFinalPosition,currentTurnState))
+                        if (!IsCheck(boardCopy, previousMoveFinalPosition, currentTurnState))
                             possibleMoves.Add(new Move(figure, finalPosition));
                         boardCopy[indexOfFigure].Data = figureDataBackUp;
                     }
@@ -125,7 +127,7 @@ public class Board : MonoBehaviour
         var currentKing = boardCopy.FirstOrDefault(figure => figure.Data.kind == Kind.King && figure.Data.isWhite == IsWhiteTurn);
         foreach (var opponentFigure in opponentTurnFigures)
         {
-            if (IsAbleToMove(opponentFigure,boardCopy, previousMoveFinalPosition, currentKing.Data.position,currentTurnState))
+            if (IsAbleToMove(opponentFigure, boardCopy, previousMoveFinalPosition, currentKing.Data.position, currentTurnState))
                 return true;
         }
         return false;
@@ -187,7 +189,7 @@ public class Board : MonoBehaviour
             CurrentTurnState = TurnState.Check;
         else
             CurrentTurnState = TurnState.Obvious;
-        if (FiguresOnBoard.Count == 2 || (FiguresOnBoard.Count == 3 && FiguresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Queen || figure.Data.kind == Kind.Rook)==null))
+        if (FiguresOnBoard.Count == 2 || (FiguresOnBoard.Count == 3 && FiguresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Queen || figure.Data.kind == Kind.Rook) == null))
         {
             CurrentTurnState = TurnState.Pat;
             CurrentGameState = GameState.Finished;
@@ -217,9 +219,9 @@ public class Board : MonoBehaviour
         figureGameObject.GetComponent<Figure>().Data = data;
         FiguresOnBoard.Add(figureGameObject.GetComponent<Figure>());
     }
-    public bool IsAbleToMove(Figure figureToMove,List<Figure> figuresOnBoard, Vector2Int previousMoveFinalPosition, Vector2Int finalPosition, TurnState currentTurnState)
+    private bool IsAbleToMove(Figure figureToMove, List<Figure> figuresOnBoard, Vector2Int previousMoveFinalPosition, Vector2Int finalPosition, TurnState currentTurnState)
     {
-        if (finalPosition.x < 0 || finalPosition.x > 7 || finalPosition.y < 0 || finalPosition.y > 7)
+        if (IsOutOfBounds(finalPosition))
             return false;
         if (figureToMove.Data.position == finalPosition)
             return false;
@@ -256,7 +258,7 @@ public class Board : MonoBehaviour
                 }
                 break;
             case Kind.Rook:
-                canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, finalPosition, Figure.RookDirections);
+                canMove = CanMoveInConcrectDirections(figureToMove, figuresOnBoard, figureToCapture, finalPosition, Figure.RookDirections);
                 break;
             case Kind.Knight:
                 if ((delta.x == 1 && delta.y == 2) || (delta.x == 2 && delta.y == 1))
@@ -264,10 +266,10 @@ public class Board : MonoBehaviour
                         canMove = true;
                 break;
             case Kind.Bishop:
-                canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, finalPosition, Figure.BishopDirections);
+                canMove = CanMoveInConcrectDirections(figureToMove, figuresOnBoard, figureToCapture, finalPosition, Figure.BishopDirections);
                 break;
             case Kind.Queen:
-                canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, finalPosition, Figure.AllDirections);
+                canMove = CanMoveInConcrectDirections(figureToMove, figuresOnBoard, figureToCapture, finalPosition, Figure.AllDirections);
                 break;
             case Kind.King:
                 if (delta.x == 2 && delta.y == 0 && figureToMove.Data.turnCount == 0 && currentTurnState != TurnState.Check)
@@ -278,7 +280,7 @@ public class Board : MonoBehaviour
                         var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
                                                          && figure.Data.isWhite == figureToMove.Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, figureToMove.Data.position.y));
                         if (suitableRook != null && suitableRook.Data.turnCount == 0)
-                            canMove = CanMoveInConcrectDirections(figureToMove,figuresOnBoard, figureToCapture, suitableRook.Data.position, Figure.RookDirections);
+                            canMove = CanMoveInConcrectDirections(figureToMove, figuresOnBoard, figureToCapture, suitableRook.Data.position, Figure.RookDirections);
                     }
                 }
                 else if (figureToCapture == null || figureToCapture.Data.isWhite != figureToMove.Data.isWhite)
@@ -287,7 +289,7 @@ public class Board : MonoBehaviour
         }
         return canMove;
     }
-    private bool CanMoveInConcrectDirections(Figure figureToMove,List<Figure> figuresOnBoard, Figure figureToCapture, Vector2Int finalPosition, Vector2Int[] allPossibleDirections)
+    private bool CanMoveInConcrectDirections(Figure figureToMove, List<Figure> figuresOnBoard, Figure figureToCapture, Vector2Int finalPosition, Vector2Int[] allPossibleDirections)
     {
         Vector2Int[] figuresPositions = figuresOnBoard.Select(figure => figure.Data.position).ToArray();
         if (figureToCapture != null && figureToCapture.Data.isWhite == figureToMove.Data.isWhite)
@@ -323,5 +325,11 @@ public class Board : MonoBehaviour
         Destroy(pawnInTheEnd.gameObject);
         GenerateFigure(modelMatcher.KindModelPairs[Tuple.Create(backUpData.kind, backUpData.isWhite)], backUpData);
         OnPause = false;
+    }
+    private bool IsOutOfBounds(Vector2Int position)
+    {
+        if (position.x < 0 || position.x > 7 || position.y < 0 || position.y > 7)
+            return true;
+        return false;
     }
 }
