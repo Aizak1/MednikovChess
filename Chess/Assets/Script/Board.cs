@@ -78,9 +78,11 @@ public class Board : MonoBehaviour
                     sfx.PlayPicKSound();
                 }
             }
-            Vector3 optimalHightForSelectedFigure = 2.2f * Vector3.up;
+            Vector3 optimalHightForSelectedFigure = 2.3f * Vector3.up;
             if (selectedFigure != null)
                 selectedFigure.transform.position = hit.point + optimalHightForSelectedFigure;
+            
+                
         }
         if (Input.GetMouseButtonUp(0))
             if (selectedFigure != null)
