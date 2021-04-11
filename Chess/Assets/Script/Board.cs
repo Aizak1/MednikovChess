@@ -24,7 +24,6 @@ public class Board : MonoBehaviour
     [SerializeField] private ModelMathcer modelMatcher;
     [SerializeField] private SFX sfx;
     [SerializeField] private GameObject vfx;
-    private Vector3 boardInitialCoordinates = new Vector3(0.05999994f, 0, 7.008001f);
     private BoardState initialState;
     private Figure selectedFigure;
     private List<Move> currentTurnMoves;
@@ -36,7 +35,7 @@ public class Board : MonoBehaviour
     public static GameState CurrentGameState { get; set; }
     private void Start()
     {
-        transform.position = boardInitialCoordinates;
+        transform.position = Vector3.zero;
         FiguresOnBoard = new List<Figure>();
         if (CurrentGameState == GameState.NotStarted)
             initialState = saveLoader.LoadState("Initial.json");
