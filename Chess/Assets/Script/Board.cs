@@ -67,7 +67,7 @@ public class Board : MonoBehaviour
                 currentTurnMoves = GetAllCurrentTurnMoves(FiguresOnBoard, PreviousMoveFinalPosition, CurrentTurnState);
                 var figure = hit.transform.gameObject.GetComponent<Figure>();
                 bool figureIsAbleToMove = currentTurnMoves.Select(move => move.CurrentFigure).ToList().Contains(figure);
-                if (figure != null && figure.Data.isWhite == IsWhiteTurn && figureIsAbleToMove)
+                if (figureIsAbleToMove)
                 {
                     selectedFigure = figure;
                     var currentFigureMoves = currentTurnMoves.Where(move => move.CurrentFigure == selectedFigure).ToList();
@@ -82,8 +82,6 @@ public class Board : MonoBehaviour
             Vector3 optimalHightForSelectedFigure = 2.3f * Vector3.up;
             if (selectedFigure != null)
                 selectedFigure.transform.position = hit.point + optimalHightForSelectedFigure;
-
-
         }
         if (Input.GetMouseButtonUp(0))
             if (selectedFigure != null)
@@ -143,18 +141,28 @@ public class Board : MonoBehaviour
         else
             CurrentTurnState = TurnState.Obvious;
         Vector2Int initialPosition = move.CurrentFigure.Data.position;
-        var possibleMove = currentTurnMoves.FirstOrDefault(validMove => validMove.CurrentFigure == move.CurrentFigure && validMove.FinalPosition == move.FinalPosition);
-        if (possibleMove == null)
+        bool isMovePossible = currentTurnMoves.Any(validMove => validMove.CurrentFigure == move.CurrentFigure && validMove.FinalPosition == move.FinalPosition);
+        if (!isMovePossible)
         {
             move.CurrentFigure.transform.position = new Vector3(initialPosition.x, 0, initialPosition.y);
             selectedFigure = null;
             sfx.PlayDropSound();
             return;
         }
+        #region Castling
         if (Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 2 && move.CurrentFigure.Data.kind == Kind.King)
-            MakeCastling(move);
+        {
+            int suitableRookXPosition = move.FinalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
+            var suitableRook = FiguresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
+                               && figure.Data.isWhite == IsWhiteTurn && figure.Data.position == new Vector2Int(suitableRookXPosition, move.CurrentFigure.Data.position.y));
+            int rookOffset = suitableRookXPosition == 0 ? -1 : 1;
+            suitableRook.Data.position = new Vector2Int(move.CurrentFigure.Data.position.x + rookOffset, move.CurrentFigure.Data.position.y);
+            suitableRook.Data.turnCount++;
+            suitableRook.transform.position = new Vector3(move.CurrentFigure.Data.position.x + rookOffset, 0, move.CurrentFigure.Data.position.y);
+        }
+        #endregion
         var figureToCapture = FiguresOnBoard.FirstOrDefault(figure => figure.Data.position == move.FinalPosition);
-        #region Проверка на взятие на проходе
+        #region  En passant
         if (figureToCapture == null && move.CurrentFigure.Data.kind == Kind.Pawn)
         {
             if (Mathf.Abs(move.CurrentFigure.Data.position.y - move.FinalPosition.y) == 1 && Mathf.Abs(move.CurrentFigure.Data.position.x - move.FinalPosition.x) == 1)
@@ -201,16 +209,6 @@ public class Board : MonoBehaviour
                 CurrentTurnState = TurnState.Pat;
             CurrentGameState = GameState.Finished;
         }
-    }
-    private void MakeCastling(Move move)
-    {
-        int suitableRookXPosition = move.FinalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
-        var suitableRook = FiguresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
-                           && figure.Data.isWhite == IsWhiteTurn && figure.Data.position == new Vector2Int(suitableRookXPosition, move.CurrentFigure.Data.position.y));
-        int rookOffset = suitableRookXPosition == 0 ? -1 : 1;
-        suitableRook.Data.position = new Vector2Int(move.CurrentFigure.Data.position.x + rookOffset, move.CurrentFigure.Data.position.y);
-        suitableRook.Data.turnCount++;
-        suitableRook.transform.position = new Vector3(move.CurrentFigure.Data.position.x + rookOffset, 0, move.CurrentFigure.Data.position.y);
     }
     private void GenerateFigure(GameObject figurePrefab, FigureData data)
     {
@@ -277,7 +275,7 @@ public class Board : MonoBehaviour
                     {
                         int suitableRookXPosition = finalPosition.x == 2 ? suitableRookXPosition = 0 : suitableRookXPosition = 7;
                         var suitableRook = figuresOnBoard.FirstOrDefault(figure => figure.Data.kind == Kind.Rook
-                                                         && figure.Data.isWhite == figureToMove.Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, figureToMove.Data.position.y));
+                                           && figure.Data.isWhite == figureToMove.Data.isWhite && figure.Data.position == new Vector2Int(suitableRookXPosition, figureToMove.Data.position.y));
                         if (suitableRook != null && suitableRook.Data.turnCount == 0)
                             canMove = CanMoveInConcrectDirections(figureToMove, figuresOnBoard, figureToCapture, suitableRook.Data.position, Figure.RookDirections);
                     }
